@@ -61,7 +61,7 @@ typedef Key =
 {
   var password:String;
   var alias:String;
-  var alias-password:String;
+  var aliasPassword:String;
 }
 
 /**
@@ -503,7 +503,8 @@ class Main
     var key = readKey();
     if ( key != null )
     {
-      
+      var xml:String = File.getContent('project.xml');
+      xml = xml.replace();
     }
     else
     {
