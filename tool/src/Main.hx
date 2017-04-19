@@ -204,16 +204,30 @@ class Main
       }
       
       // Wait 30sec...
-      Sys.sleep(30);
+      Sys.sleep(1);
+      //Sys.sleep(30);
     }
   }
   
   // Start a command and return the output
   static function call( cmd:String, args:Array<String> = null )
   {
-    Sys.command( cmd, args );
+    var log = '';
     
-    return ''; // Temporary fix...
+    /*if ( args == null )
+    {
+      var cwd = Sys.getCwd();
+      Sys.command( '${cmd} > ${cwd}/log.txt', null );
+      
+      log = File.getContent('${cwd}/log.txt');
+      FileSystem.deleteFile('${cwd}/log.txt');
+    }
+    else*/
+    {
+      Sys.command( cmd, args );
+    }
+    
+    return log; // Temporary fix...
   }
   static function getCall( cmd:String, args:Array<String> = null )
   {
@@ -265,9 +279,6 @@ class Main
   // Compile a project
   static function compileProject( project:Project )
   {
-    // Set environment
-    switchProject( project );
-    
     // Update GIT repo
     trace('Updating GIT repo...');
     trace('');
@@ -280,6 +291,9 @@ class Main
     trace('${head} - ${current}');
     
     separ();
+    
+    // Set environment
+    switchProject( project );
     
     // Compile projects
     for ( p in project.json.projects )
@@ -331,7 +345,11 @@ class Main
   {
     for ( command in commands )
     {
-      call(command);
+      var log = call(command);
+      
+      separ();
+      Sys.print(log);
+      separ();
     }
   }
   
@@ -343,16 +361,16 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = getCall('haxelib', ['run', 'openfl', 'build', 'html5', '-Dwebgl', '-minify', '-yui']);
+      log = getCall('haxelib run openfl build html5 -verbose -Dwebgl -minify -yui');
     }
     else
     {
-      log = getCall('haxelib', ['run', 'openfl', 'build', 'html5', '-final']);
+      log = getCall('haxelib run openfl build html5 -verbose -final');
     }
     
-    trace('');
+    separ();
     Sys.print(log);
-    trace('');
+    separ();
     
     // Package ZIP
     
@@ -369,16 +387,16 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'windows', '-Dlegacy']);
+      log = getCall('haxelib run openfl build windows -verbose -Dlegacy');
     }
     else
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'windows', '-final']);
+      log = getCall('haxelib run openfl build windows -verbose -final');
     }
     
-    trace('');
+    separ();
     Sys.print(log);
-    trace('');
+    separ();
     
     // Create installer
     
@@ -398,11 +416,11 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'project.android.xml', 'android', '-Dlegacy']);
+      log = getCall('haxelib run openfl build project.android.xml android -verbose -Dlegacy');
     }
     else
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'project.android.xml', 'android', '-final']);
+      log = getCall('haxelib run openfl build project.android.xml android -verbose -final');
     }
     
     trace('');
@@ -421,11 +439,11 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'mac', '-Dlegacy']);
+      log = getCall('haxelib run openfl build mac -verbose -Dlegacy');
     }
     else
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'mac', '-final']);
+      log = getCall('haxelib run openfl build mac -verbose -final');
     }
     
     trace('');
@@ -447,11 +465,11 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'ios', '-Dlegacy']);
+      log = getCall('haxelib run openfl build ios -verbose -Dlegacy');
     }
     else
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'ios', '-final']);
+      log = getCall('haxelib run openfl build ios -verbose -final');
     }
     
     trace('');
@@ -470,11 +488,11 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'linux', '-Dlegacy']);
+      log = getCall('haxelib run openfl build linux -verbose -Dlegacy');
     }
     else
     {
-      log = call('haxelib', ['run', 'openfl', 'build', 'linux', '-final']);
+      log = getCall('haxelib run openfl build linux -verbose -final');
     }
     
     trace('');
