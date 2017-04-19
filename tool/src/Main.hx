@@ -114,12 +114,15 @@ class Main
     }
     
     // Check CWD
-    var last:String = (new Path(args[args.length-1])).toString();
-    var slash = last.substr(-1);
-    if (slash=="/"|| slash=="\\") 
-      last = last.substr(0,last.length-1);
-    if (FileSystem.exists(last) && FileSystem.isDirectory(last)) {
-      Sys.setCwd(last);
+    if ( args.length > 0 )
+    {
+      var last:String = (new Path(args[args.length-1])).toString();
+      var slash = last.substr(-1);
+      if (slash=="/"|| slash=="\\") 
+        last = last.substr(0,last.length-1);
+      if (FileSystem.exists(last) && FileSystem.isDirectory(last)) {
+        Sys.setCwd(last);
+      }
     }
     
     Sys.setCwd(rel);
@@ -247,6 +250,7 @@ class Main
       {
         trace('Set ${library.name} to ${library.version}');
         call('haxelib set ${library.name} ${library.version} --always');
+        call('haxelib dev ${library.name} --always'); // Makes sure to switch off dev version...
       }
     }
     
@@ -346,9 +350,9 @@ class Main
       log = getCall('haxelib', ['run', 'openfl', 'build', 'html5', '-final']);
     }
     
-    trace('ADASDADAD');
+    trace('');
     Sys.print(log);
-    trace('ASDASDASDASDASD');
+    trace('');
     
     // Package ZIP
     
