@@ -1,4 +1,5 @@
 .DS_Store
+!README.md
 certificates
 project.android.xml
 KEY
