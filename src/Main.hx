@@ -207,7 +207,7 @@ class Main
         trace('');
         
         // Trigger if they are different
-        if ( head != current )
+        if ( (head != '') && (current != '') && (head != null) && (current != null) && (head != current) )
         {
           trace('Start compilation!');
           compileProject( project );
@@ -223,7 +223,13 @@ class Main
   // Start a command and return the output
   static function call( cmd:String, args:Array<String> = null )
   {
+    /*var t = getCall( cmd, args );
+    Sys.print( t );
+    
+    return t;*/
+    
     Sys.command( cmd, args );
+    return '';
   }
   static function getCall( cmd:String, args:Array<String> = null )
   {
@@ -231,6 +237,7 @@ class Main
     p.exitCode(true);
     
     var output = p.stdout.readAll().toString();
+    //p.kill();
     p.close();
     
     return output;
@@ -297,10 +304,14 @@ class Main
       // Get into the CWD
       Sys.setCwd('${cwd}/${project.path}/${p.folder}');
       
+      trace('* ${p.folder} : ${Sys.getCwd()}...');
+      separ();
+      
       switch ( Sys.systemName() )
       {
         case 'Windows':
           trace('Compiling for Windows platform...');
+          trace('');
           if ( p.win != null )
           {
             compile( project, p, p.win );
@@ -313,6 +324,7 @@ class Main
           }
         case 'Mac':
           trace('Compiling for Mac platform...');
+          trace('');
           if ( p.mac != null )
           {
             compile( project, p, p.mac );
@@ -324,6 +336,7 @@ class Main
           }
         case 'Linux':
           trace('Compiling for Linux platform...');
+          trace('');
           if ( p.linux != null )
           {
             compile( project, p, p.linux );
@@ -333,6 +346,8 @@ class Main
             compileLinux( project, p );
           }
       }
+      
+      separ();
     }
   }
   
@@ -424,20 +439,36 @@ class Main
     }
   }
   
+  // Get log
+  static function getLog( path:String )
+  {
+    if ( FileSystem.exists(path) )
+    {
+      var log = File.getContent(path);
+      return log;
+    }
+    
+    return '- Log not found!';
+  }
+  
   // Compile HTML5
   static function compileHTML5( project:Project, info:ProjectInfo )
   {
+    trace("- HTML5 -");
+    
     // Compile
     var log:String = '';
     
     if ( project.json.legacy )
     {
-      log = getCall('haxelib run openfl build html5 -verbose -Dwebgl -minify -yui');
+      log = call('haxelib run openfl build html5 -verbose -Dwebgl -minify -yui > Release/html5.log');
     }
     else
     {
-      log = getCall('haxelib run openfl build html5 -verbose -final');
+      log = call('haxelib run openfl build html5 -verbose -final > Release/html5.log');
     }
+    
+    log = getLog('Release/html5.log');
     
     separ();
     Sys.print(log);
@@ -453,17 +484,21 @@ class Main
   // Compile Windows
   static function compileWindows( project:Project, info:ProjectInfo )
   {
+    trace("- WINDOWS -");
+    
     // Compile
     var log:String = '';
     
     if ( project.json.legacy )
     {
-      log = getCall('haxelib run openfl build windows -verbose -Dlegacy');
+      log = call('haxelib run openfl build windows -verbose -Dlegacy > Release/windows.log');
     }
     else
     {
-      log = getCall('cmd /K "haxelib run openfl & exit;"');//getCall('haxelib run openfl build windows -verbose -final');
+      log = call('haxelib run openfl build windows -verbose -final > Release/windows.log');
     }
+    
+    log = getLog('Release/windows.log');
     
     separ();
     Sys.print(log);
@@ -482,6 +517,8 @@ class Main
   // Compile Android
   static function compileAndroid( project:Project, info:ProjectInfo )
   {
+    trace("- ANDROID -");
+    
     // Create XML project file
     if ( FileSystem.exists('project.android.xml') )
     {
@@ -509,12 +546,14 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = getCall('haxelib run openfl build project.android.xml android -verbose -Dlegacy');
+      log = call('haxelib run openfl build project.android.xml android -verbose -Dlegacy > Release/android.log');
     }
     else
     {
-      log = getCall('haxelib run openfl build project.android.xml android -verbose -final');
+      log = call('haxelib run openfl build project.android.xml android -verbose -final > Release/android.log');
     }
+    
+    log = getLog('Release/android.log');
     
     trace('');
     Sys.print(log);
@@ -530,17 +569,21 @@ class Main
   // Compile Mac
   static function compileMac( project:Project, info:ProjectInfo )
   {
+    trace("- MAC -");
+    
     // Compile
     var log:String = '';
     
     if ( project.json.legacy )
     {
-      log = getCall('haxelib run openfl build mac -verbose -Dlegacy');
+      log = call('haxelib run openfl build mac -verbose -Dlegacy > Release/mac.log');
     }
     else
     {
-      log = getCall('haxelib run openfl build mac -verbose -final');
+      log = call('haxelib run openfl build mac -verbose -final > Release/mac.log');
     }
+    
+    log = getLog('Release/mac.log');
     
     trace('');
     Sys.print(log);
@@ -556,17 +599,21 @@ class Main
   // Compile iOS
   static function compileIOS( project:Project, info:ProjectInfo )
   {
+    trace("- iOS -");
+    
     // Compile
     var log:String = '';
     
     if ( project.json.legacy )
     {
-      log = getCall('haxelib run openfl build ios -verbose -Dlegacy');
+      log = call('haxelib run openfl build ios -verbose -Dlegacy > Release/ios.log');
     }
     else
     {
-      log = getCall('haxelib run openfl build ios -verbose -final');
+      log = call('haxelib run openfl build ios -verbose -final > Release/ios.log');
     }
+    
+    log = getLog('Release/ios.log');
     
     trace('');
     Sys.print(log);
@@ -579,17 +626,21 @@ class Main
   // Compile Linux
   static function compileLinux( project:Project, info:ProjectInfo )
   {
+    trace("- LINUX -");
+    
     // Compile
     var log:String = '';
     
     if ( project.json.legacy )
     {
-      log = getCall('haxelib run openfl build linux -verbose -Dlegacy');
+      log = call('haxelib run openfl build linux -verbose -Dlegacy > Release/linux.log');
     }
     else
     {
-      log = getCall('haxelib run openfl build linux -verbose -final');
+      log = call('haxelib run openfl build linux -verbose -final > Release/linux.log');
     }
+    
+    log = getLog('Release/linux.log');
     
     trace('');
     Sys.print(log);
