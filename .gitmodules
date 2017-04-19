@@ -1,0 +1,6 @@
+[submodule "projects/openfl-sample-1"]
+	path = projects/openfl-sample-1
+	url = git@github.com:starburst997/openfl-sample-1.git
+[submodule "projects/openfl-sample-2"]
+	path = projects/openfl-sample-2
+	url = git@github.com:starburst997/openfl-sample-2.git
