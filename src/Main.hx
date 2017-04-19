@@ -462,7 +462,7 @@ class Main
     }
     else
     {
-      log = getCall('haxelib run openfl build windows -verbose -final');
+      log = getCall('cmd /K "haxelib run openfl & exit;"');//getCall('haxelib run openfl build windows -verbose -final');
     }
     
     separ();
