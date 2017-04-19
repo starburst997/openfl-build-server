@@ -56,6 +56,14 @@ typedef Library =
   @optional var folder:String; // Only for dev (we will suppose this is a git repo)
 }
 
+// Key vars
+typedef Key =
+{
+  var password:String;
+  var alias:String;
+  var alias-password:String;
+}
+
 /**
  * Simple Build Server Script
  */
@@ -396,6 +404,28 @@ class Main
     }
   }
   
+  // Read KEY
+  static function readKey():Key
+  {
+    // Check for JSON
+    var json = 'key.json';
+    if ( FileSystem.exists(json) )
+    {
+      try
+      {
+        return Json.parse(File.getContent(json));
+      }
+      catch ( e:Dynamic )
+      {
+        trace('Error parsing JSON (${json}): ${e}');
+        
+        return null;
+      }
+    }
+    
+    return null;
+  }
+  
   // Compile custom commands
   static function compile( commands:Array<String> )
   {
@@ -465,7 +495,20 @@ class Main
   static function compileAndroid( project:Project )
   {
     // Create XML project file
+    if ( FileSystem.exists('project.android.xml') )
+    {
+      FileSystem.deleteFile('project.android.xml');
+    }
     
+    var key = readKey();
+    if ( key != null )
+    {
+      
+    }
+    else
+    {
+      trace('!!! ERROR: MISSING KEY FOR ANDROID');
+    }
     
     // Compile
     var log:String = '';

@@ -1,0 +1,11 @@
+.DS_Store
+certificates
+project.android.xml
+KEY
+Export*
+js*
+*swf
+*\~
+.vscode
+Release*
+key.json
