@@ -1,0 +1,11 @@
+{
+  "name" : "openfl-build-server",
+  "url" : "https://github.com/starburst997/openfl-build-server",
+  "license" : "MIT",
+  "description" : "Simple build server for OpenFL",
+  "version" : "0.0.1",
+  "classPath": "",
+  "releasenote" : "",
+  "contributors" : ["starburst997"],
+  "dependencies" : {}
+}
