@@ -1,2 +1,2 @@
 #!/bin/bash
-neko run.n
+haxelib run openfl-build-server .
