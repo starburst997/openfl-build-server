@@ -223,22 +223,7 @@ class Main
   // Start a command and return the output
   static function call( cmd:String, args:Array<String> = null )
   {
-    var log = '';
-    
-    /*if ( args == null )
-    {
-      var cwd = Sys.getCwd();
-      Sys.command( '${cmd} > ${cwd}/log.txt', null );
-      
-      log = File.getContent('${cwd}/log.txt');
-      FileSystem.deleteFile('${cwd}/log.txt');
-    }
-    else*/
-    {
-      Sys.command( cmd, args );
-    }
-    
-    return log; // Temporary fix...
+    Sys.command( cmd, args );
   }
   static function getCall( cmd:String, args:Array<String> = null )
   {
@@ -318,34 +303,34 @@ class Main
           trace('Compiling for Windows platform...');
           if ( p.win != null )
           {
-            compile(p.win);
+            compile( project, p, p.win );
           }
           else
           {
-            compileHTML5( project );
-            compileWindows( project );
-            compileAndroid( project );
+            compileHTML5( project, p );
+            compileWindows( project, p );
+            compileAndroid( project, p );
           }
         case 'Mac':
           trace('Compiling for Mac platform...');
           if ( p.mac != null )
           {
-            compile(p.mac);
+            compile( project, p, p.mac );
           }
           else
           {
-            compileMac( project );
-            compileIOS( project );
+            compileMac( project, p );
+            compileIOS( project, p );
           }
         case 'Linux':
           trace('Compiling for Linux platform...');
           if ( p.linux != null )
           {
-            compile(p.linux);
+            compile( project, p, p.linux );
           }
           else
           {
-            compileLinux( project );
+            compileLinux( project, p );
           }
       }
     }
@@ -427,11 +412,11 @@ class Main
   }
   
   // Compile custom commands
-  static function compile( commands:Array<String> )
+  static function compile( project:Project, info:ProjectInfo, commands:Array<String> )
   {
     for ( command in commands )
     {
-      var log = call(command);
+      var log = getCall(command);
       
       separ();
       Sys.print(log);
@@ -440,7 +425,7 @@ class Main
   }
   
   // Compile HTML5
-  static function compileHTML5( project:Project )
+  static function compileHTML5( project:Project, info:ProjectInfo )
   {
     // Compile
     var log:String = '';
@@ -459,14 +444,14 @@ class Main
     separ();
     
     // Package ZIP
-    addRelease( zipFolder('Export/html5/final/bin'), 'html5.zip' );
+    addRelease( zipFolder('Export/html5/final/bin'), '${info.folder}-html5.zip' );
     
     // Send to server
     
   }
   
   // Compile Windows
-  static function compileWindows( project:Project )
+  static function compileWindows( project:Project, info:ProjectInfo )
   {
     // Compile
     var log:String = '';
@@ -484,6 +469,9 @@ class Main
     Sys.print(log);
     separ();
     
+    // Package ZIP
+    addRelease( zipFolder('Export/windows/cpp/final/bin'), '${info.folder}-windows.zip' );
+    
     // Create installer
     
     
@@ -492,7 +480,7 @@ class Main
   }
   
   // Compile Android
-  static function compileAndroid( project:Project )
+  static function compileAndroid( project:Project, info:ProjectInfo )
   {
     // Create XML project file
     if ( FileSystem.exists('project.android.xml') )
@@ -504,7 +492,12 @@ class Main
     if ( key != null )
     {
       var xml:String = File.getContent('project.xml');
-      xml = xml.replace();
+      xml = xml.replace('_PASSWORD_', key.password);
+      xml = xml.replace('_ALIAS_', key.alias);
+      xml = xml.replace('_ALIAS-PASSWORD_', key.aliasPassword);
+      xml = xml.replace('_CHANGE-TO-FINAL_', project.json.legacy ? 'release' : 'final');
+      
+      File.saveContent('project.android.xml', xml);
     }
     else
     {
@@ -527,12 +520,15 @@ class Main
     Sys.print(log);
     trace('');
     
+    // Copy package
+    //var bytes = File.getBytes('');
+    
     // Send to server
     
   }
   
   // Compile Mac
-  static function compileMac( project:Project )
+  static function compileMac( project:Project, info:ProjectInfo )
   {
     // Compile
     var log:String = '';
@@ -558,7 +554,7 @@ class Main
   }
   
   // Compile iOS
-  static function compileIOS( project:Project )
+  static function compileIOS( project:Project, info:ProjectInfo )
   {
     // Compile
     var log:String = '';
@@ -581,7 +577,7 @@ class Main
   }
   
   // Compile Linux
-  static function compileLinux( project:Project )
+  static function compileLinux( project:Project, info:ProjectInfo )
   {
     // Compile
     var log:String = '';
