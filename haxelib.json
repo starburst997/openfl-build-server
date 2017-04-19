@@ -4,8 +4,10 @@
   "license" : "MIT",
   "description" : "Simple build server for OpenFL",
   "version" : "0.0.1",
-  "classPath": "",
+  "classPath": "src",
   "releasenote" : "",
   "contributors" : ["starburst997"],
-  "dependencies" : {}
+  "dependencies" : {
+    "zip": ""
+  }
 }

@@ -1,6 +1,7 @@
 package;
 
 import haxe.Json;
+import haxe.io.Bytes;
 import haxe.io.Path;
 
 import sys.io.File;
@@ -8,6 +9,8 @@ import sys.io.Process;
 import sys.FileSystem;
 
 import neko.Lib;
+
+import zip.*;
 
 using StringTools;
 
@@ -312,8 +315,8 @@ class Main
           else
           {
             compileHTML5( project );
-            //compileWindows( project );
-            //compileAndroid( project );
+            compileWindows( project );
+            compileAndroid( project );
           }
         case 'Mac':
           trace('Compiling for Mac platform...');
@@ -337,6 +340,59 @@ class Main
             compileLinux( project );
           }
       }
+    }
+  }
+  
+  // Zip Folder
+  static function zipFolder( path:String )
+  {
+    if ( FileSystem.exists(path) && FileSystem.isDirectory(path) )
+    {
+      var zip:ZipWriter = new ZipWriter();
+      
+      zipAdd( zip, path, path.length + 1 );
+      
+      return zip.finalize();
+    }
+    
+    return null;
+  }
+  static function zipAdd( zip:ZipWriter, path:String, skipPath:Int = 0 )
+  {
+    for ( file in FileSystem.readDirectory(path) )
+    {
+      var f = '${path}/${file}';
+      if ( FileSystem.isDirectory(f) )
+      {
+        zipAdd( zip, f, skipPath );
+      }
+      else
+      {
+        zip.addBytes( File.getBytes(f), f.substr(skipPath), true );
+      }
+    }
+  }
+  
+  // Add file to release folder
+  static function addRelease( bytes:Bytes, name:String )
+  {
+    if ( bytes != null )
+    {
+      if ( !FileSystem.exists('Release') )
+      {
+        FileSystem.createDirectory('Release');
+      }
+      
+      if ( FileSystem.exists('Release/${name}') )
+      {
+        FileSystem.deleteFile('Release/${name}');
+      }
+      
+      File.saveBytes('Release/${name}', bytes);
+    }
+    else
+    {
+      trace('!!! ERROR: empty bytes for ${name}');
     }
   }
   
@@ -373,7 +429,7 @@ class Main
     separ();
     
     // Package ZIP
-    
+    addRelease( zipFolder('Export/html5/final/bin'), 'html5.zip' );
     
     // Send to server
     

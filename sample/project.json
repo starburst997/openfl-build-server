@@ -1,0 +1,26 @@
+{
+  "haxe": "3.4.2",
+  "projects":
+  [
+    {
+      "folder": "Test1"
+    }
+  ],
+  "libraries":
+  [
+    {
+      "name": "actuate",
+      "version": "dev",
+      "folder": "libs/actuate"
+    },{
+      "name": "openfl",
+      "version": "4.9.2"
+    },{
+      "name": "lime",
+      "version": "4.0.3"
+    },{
+      "name": "hxcpp",
+      "version": "3.4.64"
+    }
+  ]
+}
