@@ -837,7 +837,7 @@ class Main
       if ( FileSystem.exists('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk') ) bytes = File.getBytes('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk');
     }
     
-    addRelease( bytes, '${lime.app.file}-android.apk' );
+    addRelease( bytes, '${lime.app.file}.apk' );
     
     // Send to server
     
@@ -870,17 +870,24 @@ class Main
     // Copy .app
     var bytes:Bytes = null;
     
+    // Call command instead... Seems like some permission are lost or I dunno...
+    createDir('Release/app');
     if ( project.json.legacy )
     {
-      copyFolder('Export/mac64/cpp/bin/${lime.app.file}.app', 'Release/${lime.app.file}-mac.app');
+      call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
+      //copyFolder('Export/mac64/cpp/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
     }
     else
     {
-      copyFolder('Export/mac64/cpp/final/bin/${lime.app.file}.app', 'Release/${lime.app.file}-mac.app');
+      call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
+      //copyFolder('Export/mac64/cpp/final/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
     }
     
     // Create DMG
-    
+    if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
+    {
+      call('./${Sys.programPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon "icon.icns" --background "utils/bg.png" --window-pos 200 120 --window-size 770 350 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 "Release/${lime.app.file}.dmg" "Release/app"');
+    }
     
     // Send to server
     
@@ -914,6 +921,24 @@ class Main
     trace('');
     Sys.print(log);
     trace('');
+    
+    // Copy package
+    var bytes:Bytes = null;
+    
+    if ( project.json.legacy )
+    {
+      if ( FileSystem.exists('Export/ios/build/Release-iphoneos/${lime.app.file}.app') ) 
+      {
+        call('/usr/bin/xcrun -sdk iphoneos PackageApplication -v "Export/ios/build/Release-iphoneos/${lime.app.file}.app" -o "Release/${lime.app.file}.ipa"');
+      }
+    }
+    else
+    {
+      if ( FileSystem.exists('Export/ios/final/build/Release-iphoneos/${lime.app.file}.app') ) 
+      {
+        call('/usr/bin/xcrun -sdk iphoneos PackageApplication -v "Export/ios/final/build/Release-iphoneos/${lime.app.file}.app" -o "Release/${lime.app.file}.ipa"');
+      }
+    }
     
     // Send to server
     
