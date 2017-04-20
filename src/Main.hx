@@ -284,13 +284,19 @@ class Main
   // Start a command and return the output
   static function call( cmd:String, args:Array<String> = null )
   {
-    var t = getCall( cmd, args );
+    var p = new Process( cmd, args );
+    p.exitCode(true);
+    p.close();
+    
+    return '';
+    
+    /*var t = getCall( cmd, args );
     Sys.print( t );
     
-    return t;
+    return t;*/
     
-    Sys.command( cmd, args );
-    return '';
+    /*Sys.command( cmd, args );
+    return '';*/
   }
   static function getCall( cmd:String, args:Array<String> = null )
   {
