@@ -368,8 +368,12 @@ class Main
       separ();
       
       // Delete Release / Export folder (make sure we don't have old assets)
+      trace('Removing Release / Export directory...');
       removeDir('Release');
-      removeDir('Export');
+      //removeDir('Export');
+      createDir('Release');
+      createDir('Export');
+      trace('');
       
       // Get lime project
       var limeProject = parseHXProject('${cwd}/${project.path}/${p.folder}/project.xml');
@@ -451,6 +455,16 @@ class Main
       {
         trace('Could not delete directory: ${path}');
       }
+    }
+  }
+  static function emptyDir( path:String )
+  {
+    removeDir( path );
+    
+    if ( !FileSystem.exists( path ) )
+    {
+      FileSystem.createDirectory( path );
+      trace('Created directory ${path}');
     }
   }
   
@@ -556,6 +570,22 @@ class Main
     return '- Log not found!';
   }
   
+  // Makes sure a directory exists
+  static function createDir( path:String )
+  {
+    var dirs = path.split('/');
+    var p = '';
+    
+    for ( dir in dirs )
+    {
+      p += (p == '' ? '' : '/') + dir;
+      if ( !FileSystem.exists(p) )
+      {
+        FileSystem.createDirectory(p);
+      }
+    }
+  }
+  
   // Compile HTML5
   static function compileHTML5( project:Project, info:ProjectInfo, lime:HXProject )
   {
@@ -566,10 +596,16 @@ class Main
     
     if ( project.json.legacy )
     {
+      removeDir('Export/html5/bin');
+      
       log = call('haxelib run openfl build html5 -verbose -Dwebgl -minify -yui > Release/html5.log');
     }
     else
     {
+      // Weird bug?
+      removeDir('Export/html5/final/bin');
+      createDir('Export/html5/final/haxe/_generated');
+      
       log = call('haxelib run openfl build html5 -verbose -final > Release/html5.log');
     }
     
@@ -603,10 +639,16 @@ class Main
     
     if ( project.json.legacy )
     {
+      removeDir('Export/windows/cpp/bin');
+      
       log = call('haxelib run openfl build windows -verbose -Dlegacy > Release/windows.log');
     }
     else
     {
+      // Weird bug?
+      removeDir('Export/windows/cpp/final/bin');
+      createDir('Export/windows/cpp/final/haxe/_generated');
+      
       log = call('haxelib run openfl build windows -verbose -final > Release/windows.log');
     }
     
@@ -666,10 +708,16 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib run openfl build project.android.xml android -verbose -Dlegacy > Release/android.log');
+      removeDir('Export/android/bin');
+      
+      log = call('haxelib run openfl build project.android.xml android -verbose -Dlegacy -Drelease > Release/android.log');
     }
     else
     {
+      // Weird bug?
+      removeDir('Export/android');
+      createDir('Export/android/final/haxe/_generated');
+      
       log = call('haxelib run openfl build project.android.xml android -verbose -final > Release/android.log');
     }
     
