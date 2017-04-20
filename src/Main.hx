@@ -333,8 +333,8 @@ class Main
       else
       {
         trace('Set ${library.name} to ${library.version}');
-        call('haxelib set ${library.name} ${library.version} --always');
-        call('haxelib dev ${library.name} --always'); // Makes sure to switch off dev version...
+        Sys.command('haxelib set ${library.name} ${library.version} --always');
+        Sys.command('haxelib dev ${library.name} --always'); // Makes sure to switch off dev version...
       }
     }
     
