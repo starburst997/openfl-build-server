@@ -462,7 +462,7 @@ class Main
           else
           {
             compileMac( project, p, limeProject );
-            compileIOS( project, p, limeProject );
+            //compileIOS( project, p, limeProject );
           }
         case 'Linux':
           trace('Compiling for Linux platform...');
@@ -886,7 +886,7 @@ class Main
     // Create DMG
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
-      call('./${Sys.programPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon "icon.icns" --background "utils/bg.png" --window-pos 200 120 --window-size 770 350 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 "Release/${lime.app.file}.dmg" "Release/app"');
+      call('${Sys.programPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon "icon.icns" --background "utils/bg.png" --window-pos 200 120 --window-size 770 350 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 "Release/${lime.app.file}.dmg" "Release/app"');
     }
     
     // Send to server
