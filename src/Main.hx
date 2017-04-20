@@ -857,6 +857,7 @@ class Main
     }
     else
     {
+      createDir('Export/mac64/cpp/final/haxe/_generated');
       log = call('haxelib run openfl build mac -verbose -final > Release/mac.log');
     }
     
@@ -904,6 +905,7 @@ class Main
     }
     else
     {
+      createDir('Export/ios/final/${lime.app.file}/haxe/_generated');
       log = call('haxelib run openfl build ios -verbose -final > Release/ios.log');
     }
     
@@ -931,6 +933,7 @@ class Main
     }
     else
     {
+      createDir('Export/linux64/cpp/final/haxe/_generated');
       log = call('haxelib run openfl build linux -verbose -final > Release/linux.log');
     }
     
