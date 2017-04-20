@@ -927,17 +927,11 @@ class Main
     
     if ( project.json.legacy )
     {
-      if ( FileSystem.exists('Export/ios/build/Release-iphoneos/${lime.app.file}.app') ) 
-      {
-        call('/usr/bin/xcrun -sdk iphoneos PackageApplication -v "Export/ios/build/Release-iphoneos/${lime.app.file}.app" -o "Release/${lime.app.file}.ipa"');
-      }
+      call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}');
     }
     else
     {
-      if ( FileSystem.exists('Export/ios/final/build/Release-iphoneos/${lime.app.file}.app') ) 
-      {
-        call('/usr/bin/xcrun -sdk iphoneos PackageApplication -v "Export/ios/final/build/Release-iphoneos/${lime.app.file}.app" -o "Release/${lime.app.file}.ipa"');
-      }
+      call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}');
     }
     
     // Send to server
