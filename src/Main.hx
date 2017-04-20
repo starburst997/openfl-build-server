@@ -1,9 +1,13 @@
 package;
 
 import haxe.Json;
+import haxe.Timer;
 import haxe.io.Bytes;
 import haxe.io.Path;
 import haxe.xml.Fast;
+import neko.vm.Lock;
+import neko.vm.Thread;
+import neko.vm.Ui;
 
 import sys.io.File;
 import sys.io.Process;
@@ -188,13 +192,26 @@ class Main
       // Start loop
       if ( projects.length > 0 )
       {
-        gitLoop();
+        // Create a Thread instead, the program was never being properly quit otherwise
+        var t = Thread.create(gitLoop);
+        
+        //gitLoop();
+        
+        // We wait for a input from the user (simply hit enter)
+        // Couldn't figure out how to "listens" for an interrupt on neko...
+        trace('Waiting for enter...');
+        var input = Sys.stdin().readInt16();
+        trace('All done ${input} ...');
+        
+        t.sendMessage(666);
       }
       else
       {
         trace('No project found!');
       }
     }
+    
+    Sys.exit(0);
 	}
   
   // Just a distinc separation
@@ -211,6 +228,18 @@ class Main
     // Now loop every 30sec and check if there was a change to the git
     while ( true )
     {
+      if ( Thread.readMessage(false) == 666 )
+      {
+        trace('Message received!');
+        break;
+      }
+      
+      //var l = new Lock();
+      
+      separ();
+      
+      trace('Press enter to exit properly...');
+      
       separ();
       
       for ( project in projects )
@@ -238,19 +267,27 @@ class Main
         }
       }
       
+      //l.release();
+      
       // Wait 30sec...
       Sys.sleep(1);
       //Sys.sleep(30);
     }
+    
+    // Trying timer since while loop since to break ctrl+c
+    //Sys.sleep(1);
+    //Timer.delay(gitLoop, 1000);
+    
+    //Sys.exit(0);
   }
   
   // Start a command and return the output
   static function call( cmd:String, args:Array<String> = null )
   {
-    /*var t = getCall( cmd, args );
+    var t = getCall( cmd, args );
     Sys.print( t );
     
-    return t;*/
+    return t;
     
     Sys.command( cmd, args );
     return '';
@@ -345,12 +382,24 @@ class Main
     trace('Updating GIT repo...');
     trace('');
     
-    call('git', ['pull']);
-    call('git', ['submodule', 'update', '--init', '--recursive']);
+    //trace('${Sys.getCwd()}');
+    
+    //Sys.command('git pull');
+    
+    call('git pull');
+    call('git submodule update --init --recursive');
     
     var head = getCall('git', ['rev-parse', 'HEAD']);
     var current = getCall('git', ['rev-parse', '@{u}']);
     trace('${head} - ${current}');
+    
+    if ( head != current )
+    {
+      separ();
+      trace('- WARNING: Something wrong with git pull... -');
+      separ();
+      return;
+    }
     
     separ();
     
@@ -840,6 +889,9 @@ class Main
     
     if ( project.json.legacy )
     {
+      // Add support for team-id on legacy project without any modification to lime
+      
+      
       // -Dsource-header=0
       // No idea why this is needed...
       log = call('haxelib run openfl build ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
