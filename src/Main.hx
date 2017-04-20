@@ -782,20 +782,52 @@ class Main
     
     if ( project.json.legacy )
     {
-      if ( FileSystem.exists('Export/mac64/cpp/bin/${lime.app.file}.app') ) bytes = File.getBytes('Export/mac64/cpp/bin/${lime.app.file}.app');
+      copyFolder('Export/mac64/cpp/bin/${lime.app.file}.app', 'Release/${lime.app.file}-mac.app');
     }
     else
     {
-      if ( FileSystem.exists('Export/mac64/cpp/final/bin/${lime.app.file}.app') ) bytes = File.getBytes('Export/mac64/cpp/final/bin/${lime.app.file}.app');
+      copyFolder('Export/mac64/cpp/final/bin/${lime.app.file}.app', 'Release/${lime.app.file}-mac.app');
     }
-    
-    addRelease( bytes, '${lime.app.file}-mac.app' );
     
     // Create DMG
     
     
     // Send to server
     
+  }
+  
+  // Copy folder
+  static function copyFolder( path:String, destination:String )
+  {
+    if ( FileSystem.exists(path) && FileSystem.isDirectory(path) )
+    {
+      if ( FileSystem.exists(destination) )
+      {
+        if ( FileSystem.isDirectory(destination) ) 
+        {
+          removeDir(destination);
+        }
+        else
+        {
+          FileSystem.deleteFile(destination);
+        }
+      }
+      
+      FileSystem.createDirectory(destination);
+      
+      // Alright begin with this copy!
+      for ( file in FileSystem.readDirectory(path) )
+      {
+        if ( FileSystem.isDirectory('${path}/${file}') )
+        {
+          copyFolder('${path}/${file}', '${destination}/${file}');
+        }
+        else
+        {
+          File.saveBytes( '${destination}/${file}', File.getBytes('${path}/${file}') );
+        }
+      }
+    }
   }
   
   // Compile iOS
