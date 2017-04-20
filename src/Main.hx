@@ -125,8 +125,8 @@ class Main
     trace('');
     trace('Makes sure you can build on each of the platform');
     trace('WIN: Windows / HTML5');
-    trace('MAC: Mac / iOS / Android');
-    trace('LINUX: Linux');
+    trace('MAC: Mac / iOS');
+    trace('LINUX: Linux / Android');
     
     separ();
     
@@ -408,7 +408,6 @@ class Main
           {
             compileMac( project, p, limeProject );
             compileIOS( project, p, limeProject );
-            compileAndroid( project, p, limeProject );
           }
         case 'Linux':
           trace('Compiling for Linux platform...');
@@ -420,6 +419,7 @@ class Main
           else
           {
             compileLinux( project, p, limeProject );
+            compileAndroid( project, p, limeProject );
           }
       }
       
