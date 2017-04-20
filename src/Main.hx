@@ -284,6 +284,8 @@ class Main
   // Start a command and return the output
   static function call( cmd:String, args:Array<String> = null )
   {
+    trace('Calling: ${cmd}');
+    
     var p = new Process( cmd, args );
     p.exitCode(true);
     p.close();
