@@ -3,6 +3,7 @@ package;
 import haxe.Json;
 import haxe.io.Bytes;
 import haxe.io.Path;
+import haxe.xml.Fast;
 
 import sys.io.File;
 import sys.io.Process;
@@ -19,6 +20,26 @@ typedef Project =
 {
   var json:ProjectJSON;
   var path:String;
+}
+
+// Lime Project XML, very basic processing
+typedef HXProject = 
+{
+  var app:HXProjectApp;
+  var meta:HXProjectMeta;
+}
+typedef HXProjectApp =
+{
+  var file:String;
+  var main:String;
+  var path:String;
+}
+typedef HXProjectMeta =
+{
+  var pkg:String;
+  var company:String;
+  var title:String;
+  var version:String;
 }
 
 // Project JSON
@@ -279,6 +300,41 @@ class Main
     separ();
   }
   
+  // Parse project XML
+  static function parseHXProject( path:String )
+  {
+    if ( FileSystem.exists(path) )
+    {
+      var content = File.getContent( path );
+      var xml = Xml.parse( content );
+      var fast = new Fast(xml.firstElement());
+      
+      var app = fast.node.app;
+      var meta = fast.node.meta;
+      
+      var project:HXProject = 
+      {
+        app: 
+        {
+          main: app.att.main,
+          path: app.att.path,
+          file: app.att.file
+        },
+        meta:
+        {
+          title: meta.att.title,
+          pkg: meta.att.resolve('package'),
+          version: meta.att.version,
+          company: meta.att.company
+        }
+      };
+      
+      return project;
+    }
+    
+    return null;
+  }
+  
   // Compile a project
   static function compileProject( project:Project )
   {
@@ -295,6 +351,10 @@ class Main
     
     separ();
     
+    // Update project file
+    var newProject = getProject('.');
+    project.json = newProject.json;
+    
     // Set environment
     switchProject( project );
     
@@ -307,6 +367,14 @@ class Main
       trace('* ${p.folder} : ${Sys.getCwd()}...');
       separ();
       
+      // Delete Release / Export folder (make sure we don't have old assets)
+      removeDir('Release');
+      removeDir('Export');
+      
+      // Get lime project
+      var limeProject = parseHXProject('${cwd}/${project.path}/${p.folder}/project.xml');
+      
+      // Compile based on platform
       switch ( Sys.systemName() )
       {
         case 'Windows':
@@ -314,40 +382,75 @@ class Main
           trace('');
           if ( p.win != null )
           {
-            compile( project, p, p.win );
+            compile( project, p, limeProject, p.win );
           }
           else
           {
-            compileHTML5( project, p );
-            compileWindows( project, p );
-            compileAndroid( project, p );
+            compileHTML5( project, p, limeProject );
+            compileWindows( project, p, limeProject );
+            compileAndroid( project, p, limeProject );
           }
         case 'Mac':
           trace('Compiling for Mac platform...');
           trace('');
           if ( p.mac != null )
           {
-            compile( project, p, p.mac );
+            compile( project, p, limeProject, p.mac );
           }
           else
           {
-            compileMac( project, p );
-            compileIOS( project, p );
+            compileMac( project, p, limeProject );
+            compileIOS( project, p, limeProject );
           }
         case 'Linux':
           trace('Compiling for Linux platform...');
           trace('');
           if ( p.linux != null )
           {
-            compile( project, p, p.linux );
+            compile( project, p, limeProject, p.linux );
           }
           else
           {
-            compileLinux( project, p );
+            compileLinux( project, p, limeProject );
           }
       }
       
       separ();
+    }
+  }
+  
+  // Remove a directory and everything inside
+  static function removeDir( path:String )
+  {
+    if ( FileSystem.exists(path) && FileSystem.isDirectory(path) )
+    {
+      for ( file in FileSystem.readDirectory(path) )
+      {
+        if ( FileSystem.isDirectory('${path}/${file}') )
+        {
+          removeDir('${path}/${file}');
+        }
+        else
+        {
+          try
+          {
+            FileSystem.deleteFile('${path}/${file}');
+          }
+          catch ( e:Dynamic )
+          {
+            trace('Could not delete file: ${path}/${file}');
+          }
+        }
+      }
+      
+      try
+      {
+        FileSystem.deleteDirectory(path);
+      }
+      catch ( e:Dynamic )
+      {
+        trace('Could not delete directory: ${path}');
+      }
     }
   }
   
@@ -427,7 +530,7 @@ class Main
   }
   
   // Compile custom commands
-  static function compile( project:Project, info:ProjectInfo, commands:Array<String> )
+  static function compile( project:Project, info:ProjectInfo, lime:HXProject, commands:Array<String> )
   {
     for ( command in commands )
     {
@@ -442,6 +545,8 @@ class Main
   // Get log
   static function getLog( path:String )
   {
+    Sys.sleep(5); // Making sure we can access the log (also for some weird reason, legacy need some time...)
+    
     if ( FileSystem.exists(path) )
     {
       var log = File.getContent(path);
@@ -452,7 +557,7 @@ class Main
   }
   
   // Compile HTML5
-  static function compileHTML5( project:Project, info:ProjectInfo )
+  static function compileHTML5( project:Project, info:ProjectInfo, lime:HXProject )
   {
     trace("- HTML5 -");
     
@@ -475,14 +580,21 @@ class Main
     separ();
     
     // Package ZIP
-    addRelease( zipFolder('Export/html5/final/bin'), '${info.folder}-html5.zip' );
+    if ( project.json.legacy )
+    {
+      addRelease( zipFolder('Export/html5/bin'), '${lime.app.file}-html5.zip' );
+    }
+    else
+    {
+      addRelease( zipFolder('Export/html5/final/bin'), '${lime.app.file}-html5.zip' );
+    }
     
     // Send to server
     
   }
   
   // Compile Windows
-  static function compileWindows( project:Project, info:ProjectInfo )
+  static function compileWindows( project:Project, info:ProjectInfo, lime:HXProject )
   {
     trace("- WINDOWS -");
     
@@ -505,7 +617,14 @@ class Main
     separ();
     
     // Package ZIP
-    addRelease( zipFolder('Export/windows/cpp/final/bin'), '${info.folder}-windows.zip' );
+    if ( project.json.legacy )
+    {
+      addRelease( zipFolder('Export/windows/cpp/bin'), '${lime.app.file}-windows.zip' );
+    }
+    else
+    {
+      addRelease( zipFolder('Export/windows/cpp/final/bin'), '${lime.app.file}-windows.zip' );
+    }
     
     // Create installer
     
@@ -515,7 +634,7 @@ class Main
   }
   
   // Compile Android
-  static function compileAndroid( project:Project, info:ProjectInfo )
+  static function compileAndroid( project:Project, info:ProjectInfo, lime:HXProject )
   {
     trace("- ANDROID -");
     
@@ -539,6 +658,7 @@ class Main
     else
     {
       trace('!!! ERROR: MISSING KEY FOR ANDROID');
+      return;
     }
     
     // Compile
@@ -560,14 +680,25 @@ class Main
     trace('');
     
     // Copy package
-    //var bytes = File.getBytes('');
+    var bytes:Bytes;
+    
+    if ( project.json.legacy )
+    {
+      bytes = File.getBytes('Export/android/bin/bin/${lime.app.file}-release.apk');
+    }
+    else
+    {
+      bytes = File.getBytes('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk');
+    }
+    
+    addRelease( bytes, '${lime.app.file}-android.apk' );
     
     // Send to server
     
   }
   
   // Compile Mac
-  static function compileMac( project:Project, info:ProjectInfo )
+  static function compileMac( project:Project, info:ProjectInfo, lime:HXProject )
   {
     trace("- MAC -");
     
@@ -597,7 +728,7 @@ class Main
   }
   
   // Compile iOS
-  static function compileIOS( project:Project, info:ProjectInfo )
+  static function compileIOS( project:Project, info:ProjectInfo, lime:HXProject )
   {
     trace("- iOS -");
     
@@ -624,7 +755,7 @@ class Main
   }
   
   // Compile Linux
-  static function compileLinux( project:Project, info:ProjectInfo )
+  static function compileLinux( project:Project, info:ProjectInfo, lime:HXProject )
   {
     trace("- LINUX -");
     
