@@ -116,13 +116,16 @@ class Main
     
 		// Init
     trace('Simple Build Server for OpenFL');
-    trace('You need to have the following installed: git, npm');
+    trace('You need to have the following installed: git, npm, ruby');
+    trace('');
     trace('Install "switchx" to switch between haxe version:');
     trace('    npm install haxeshim -g && npm install switchx -g && switchx');
+    trace('Install "fastlane" for easy deploy');
+    trace('    gem install fastlane');
     trace('');
     trace('Makes sure you can build on each of the platform');
-    trace('WIN: Windows / HTML5 / Android');
-    trace('MAC: Mac / iOS');
+    trace('WIN: Windows / HTML5');
+    trace('MAC: Mac / iOS / Android');
     trace('LINUX: Linux');
     
     separ();
@@ -370,7 +373,8 @@ class Main
       // Delete Release / Export folder (make sure we don't have old assets)
       trace('Removing Release / Export directory...');
       removeDir('Release');
-      //removeDir('Export');
+      removeDir('Export'); // Necessary???
+      
       createDir('Release');
       createDir('Export');
       trace('');
@@ -392,7 +396,6 @@ class Main
           {
             compileHTML5( project, p, limeProject );
             compileWindows( project, p, limeProject );
-            compileAndroid( project, p, limeProject );
           }
         case 'Mac':
           trace('Compiling for Mac platform...');
@@ -405,6 +408,7 @@ class Main
           {
             compileMac( project, p, limeProject );
             compileIOS( project, p, limeProject );
+            compileAndroid( project, p, limeProject );
           }
         case 'Linux':
           trace('Compiling for Linux platform...');
@@ -573,6 +577,11 @@ class Main
   // Makes sure a directory exists
   static function createDir( path:String )
   {
+    if ( !FileSystem.exists(path) )
+    {
+      FileSystem.createDirectory(path);
+    }
+    
     var dirs = path.split('/');
     var p = '';
     
@@ -728,15 +737,15 @@ class Main
     trace('');
     
     // Copy package
-    var bytes:Bytes;
+    var bytes:Bytes = null;
     
     if ( project.json.legacy )
     {
-      bytes = File.getBytes('Export/android/bin/bin/${lime.app.file}-release.apk');
+      if ( FileSystem.exists('Export/android/bin/bin/${lime.app.file}-release.apk') ) bytes = File.getBytes('Export/android/bin/bin/${lime.app.file}-release.apk');
     }
     else
     {
-      bytes = File.getBytes('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk');
+      if ( FileSystem.exists('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk') ) bytes = File.getBytes('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk');
     }
     
     addRelease( bytes, '${lime.app.file}-android.apk' );
