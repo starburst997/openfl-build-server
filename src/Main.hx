@@ -777,6 +777,20 @@ class Main
     Sys.print(log);
     trace('');
     
+    // Copy .app
+    var bytes:Bytes = null;
+    
+    if ( project.json.legacy )
+    {
+      if ( FileSystem.exists('Export/mac64/cpp/bin/${lime.app.file}.app') ) bytes = File.getBytes('Export/mac64/cpp/bin/${lime.app.file}.app');
+    }
+    else
+    {
+      if ( FileSystem.exists('Export/mac64/cpp/final/bin/${lime.app.file}.app') ) bytes = File.getBytes('Export/mac64/cpp/final/bin/${lime.app.file}.app');
+    }
+    
+    addRelease( bytes, '${lime.app.file}-mac.app' );
+    
     // Create DMG
     
     
@@ -794,7 +808,9 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib run openfl build ios -verbose -Dlegacy > Release/ios.log');
+      // -Dsource-header=0
+      // No idea why this is needed...
+      log = call('haxelib run openfl build ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
     }
     else
     {
