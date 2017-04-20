@@ -595,6 +595,40 @@ class Main
     }
   }
   
+  // Copy folder
+  static function copyFolder( path:String, destination:String )
+  {
+    if ( FileSystem.exists(path) && FileSystem.isDirectory(path) )
+    {
+      if ( FileSystem.exists(destination) )
+      {
+        if ( FileSystem.isDirectory(destination) ) 
+        {
+          removeDir(destination);
+        }
+        else
+        {
+          FileSystem.deleteFile(destination);
+        }
+      }
+      
+      FileSystem.createDirectory(destination);
+      
+      // Alright begin with this copy!
+      for ( file in FileSystem.readDirectory(path) )
+      {
+        if ( FileSystem.isDirectory('${path}/${file}') )
+        {
+          copyFolder('${path}/${file}', '${destination}/${file}');
+        }
+        else
+        {
+          File.saveBytes( '${destination}/${file}', File.getBytes('${path}/${file}') );
+        }
+      }
+    }
+  }
+  
   // Compile HTML5
   static function compileHTML5( project:Project, info:ProjectInfo, lime:HXProject )
   {
@@ -794,40 +828,6 @@ class Main
     
     // Send to server
     
-  }
-  
-  // Copy folder
-  static function copyFolder( path:String, destination:String )
-  {
-    if ( FileSystem.exists(path) && FileSystem.isDirectory(path) )
-    {
-      if ( FileSystem.exists(destination) )
-      {
-        if ( FileSystem.isDirectory(destination) ) 
-        {
-          removeDir(destination);
-        }
-        else
-        {
-          FileSystem.deleteFile(destination);
-        }
-      }
-      
-      FileSystem.createDirectory(destination);
-      
-      // Alright begin with this copy!
-      for ( file in FileSystem.readDirectory(path) )
-      {
-        if ( FileSystem.isDirectory('${path}/${file}') )
-        {
-          copyFolder('${path}/${file}', '${destination}/${file}');
-        }
-        else
-        {
-          File.saveBytes( '${destination}/${file}', File.getBytes('${path}/${file}') );
-        }
-      }
-    }
   }
   
   // Compile iOS
