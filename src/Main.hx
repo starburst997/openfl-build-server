@@ -918,7 +918,7 @@ class Main
     // Create DMG
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
-      call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}.dmg ${full("Release/app")}');
+      call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/${lime.app.file}.app/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}.dmg ${full("Release/app")}');
     }
     
     // Send to server
@@ -958,7 +958,8 @@ class Main
       log = call('haxelib run openfl build project.ios.xml ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
       
       // Cleanup
-      FileSystem.deleteFile('project.ios.xml');
+      //removeDir('templates_ignore');
+      //FileSystem.deleteFile('project.ios.xml');
     }
     else
     {
