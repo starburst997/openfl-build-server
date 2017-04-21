@@ -31,6 +31,7 @@ typedef HXProject =
 {
   var app:HXProjectApp;
   var meta:HXProjectMeta;
+  @optional var certificate:HXProjectCertificate;
 }
 typedef HXProjectApp =
 {
@@ -44,6 +45,10 @@ typedef HXProjectMeta =
   var company:String;
   var title:String;
   var version:String;
+}
+typedef HXProjectCertificate =
+{
+  var teamID:String;
 }
 
 // Project JSON
@@ -374,8 +379,17 @@ class Main
           pkg: meta.att.resolve('package'),
           version: meta.att.version,
           company: meta.att.company
-        }
+        },
+        certificate: null
       };
+      
+      if ( fast.node.certificate != null )
+      {
+        project.certificate = 
+        {
+          teamID: fast.node.certificate.att.resolve('team-id')
+        };
+      }
       
       return project;
     }
@@ -943,11 +957,25 @@ class Main
     
     if ( project.json.legacy )
     {
-      call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}');
+      if ( lime.certificate != null )
+      {
+        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}');
+      }
+      else
+      {
+        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}');
+      }
     }
     else
     {
-      call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}');
+      if ( lime.certificate != null )
+      {
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}');
+      }
+      else
+      {
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}');
+      }
     }
     
     // Send to server
