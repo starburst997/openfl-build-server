@@ -104,6 +104,7 @@ class Main
   static inline var JSON = 'project.json';
   
   // Var
+  static var git:String = '';
   static var cwd:String = '';
   static var projects:Array<Project> = null;
   static var oldTrace = haxe.Log.trace;
@@ -255,7 +256,7 @@ class Main
         // Get into the CWD
         Sys.setCwd('${cwd}/${project.path}');
         
-        call('git', ['fetch']);
+        call('git fetch');
         
         var head = getCall('git', ['rev-parse', 'HEAD']);
         trace('HEAD: ${head}');
@@ -263,6 +264,12 @@ class Main
         var current = getCall('git', ['rev-parse', '@{u}']);
         trace('Current: ${current}');
         trace('');
+        
+        // Fix for when current is empty
+        if ( current == '' )
+        {
+          call('git checkout master');
+        }
         
         // Trigger if they are different
         if ( (head != '') && (current != '') && (head != null) && (current != null) && (head != current) )
@@ -422,6 +429,8 @@ class Main
       separ();
       return;
     }
+    
+    git = head.substr(0, 7);
     
     separ();
     
@@ -748,11 +757,11 @@ class Main
     // Package ZIP
     if ( project.json.legacy )
     {
-      addRelease( zipFolder('Export/html5/bin'), '${lime.app.file}-html5.zip' );
+      addRelease( zipFolder('Export/html5/bin'), '${lime.app.file}-html5-${git}.zip' );
     }
     else
     {
-      addRelease( zipFolder('Export/html5/final/bin'), '${lime.app.file}-html5.zip' );
+      addRelease( zipFolder('Export/html5/final/bin'), '${lime.app.file}-html5-${git}.zip' );
     }
     
     // Send to server
@@ -791,11 +800,11 @@ class Main
     // Package ZIP
     if ( project.json.legacy )
     {
-      addRelease( zipFolder('Export/windows/cpp/bin'), '${lime.app.file}-windows.zip' );
+      addRelease( zipFolder('Export/windows/cpp/bin'), '${lime.app.file}-windows-${git}.zip' );
     }
     else
     {
-      addRelease( zipFolder('Export/windows/cpp/final/bin'), '${lime.app.file}-windows.zip' );
+      addRelease( zipFolder('Export/windows/cpp/final/bin'), '${lime.app.file}-windows-${git}.zip' );
     }
     
     // Create installer
@@ -820,10 +829,7 @@ class Main
     if ( key != null )
     {
       var xml:String = File.getContent('project.xml');
-      xml = xml.replace('_PASSWORD_', key.password);
-      xml = xml.replace('_ALIAS_', key.alias);
-      xml = xml.replace('_ALIAS-PASSWORD_', key.aliasPassword);
-      xml = xml.replace('_CHANGE-TO-FINAL_', project.json.legacy ? 'release' : 'final');
+      xml = xml.replace('</project>', '<certificate path="certificates/key.keystore" password="${key.password}" alias="${key.alias}" alias-password="${key.aliasPassword}" /></project>');
       
       File.saveContent('project.android.xml', xml);
     }
@@ -851,6 +857,10 @@ class Main
       log = call('haxelib run openfl build project.android.xml android -verbose -final > Release/android.log');
     }
     
+    // Cleanup
+    FileSystem.deleteFile('project.android.xml');
+    
+    // Get log
     log = getLog('Release/android.log');
     
     trace('');
@@ -869,7 +879,7 @@ class Main
       if ( FileSystem.exists('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk') ) bytes = File.getBytes('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk');
     }
     
-    addRelease( bytes, '${lime.app.file}.apk' );
+    addRelease( bytes, '${lime.app.file}-${git}.apk' );
     
     // Send to server
     
@@ -918,7 +928,7 @@ class Main
     // Create DMG
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
-      call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/${lime.app.file}.app/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}.dmg ${full("Release/app")}');
+      call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/${lime.app.file}.app/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}-${git}.dmg ${full("Release/app")}');
     }
     
     // Send to server
@@ -982,11 +992,11 @@ class Main
       
       if ( lime.certificate != null )
       {
-        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}');
+        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}-${git}');
       }
       else
       {
-        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}');
+        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}-${git}');
       }
     }
     else
@@ -995,11 +1005,11 @@ class Main
       
       if ( lime.certificate != null )
       {
-        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}');
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}-${git}');
       }
       else
       {
-        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -o Release -n ${lime.app.file}');
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -o Release -n ${lime.app.file}-${git}');
       }
     }
     
