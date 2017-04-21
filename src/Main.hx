@@ -948,6 +948,8 @@ class Main
       var content = File.getContent('${getPath()}/utils/project.pbxproj');
       content = content.replace('::if DEVELOPMENT_TEAM_ID::', '::if APP_FILE::'); // true?
       content = content.replace('::DEVELOPMENT_TEAM_ID::', '${lime.certificate.teamID}');
+      content = content.replace('::if CODE_SIGN_IDENTITY::', '::if APP_FILE::'); // true?
+      content = content.replace('::CODE_SIGN_IDENTITY::', 'iPhone Developer');
       
       createDir('templates_ignore/iphone/PROJ.xcodeproj');
       File.saveContent('templates_ignore/iphone/PROJ.xcodeproj/project.pbxproj', content);
@@ -957,8 +959,8 @@ class Main
       log = call('haxelib run openfl build project.ios.xml ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
       
       // Cleanup
-      //removeDir('templates_ignore');
-      //FileSystem.deleteFile('project.ios.xml');
+      removeDir('templates_ignore');
+      FileSystem.deleteFile('project.ios.xml');
     }
     else
     {
