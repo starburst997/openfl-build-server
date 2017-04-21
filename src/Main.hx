@@ -109,6 +109,8 @@ class Main
   static var projects:Array<Project> = null;
   static var oldTrace = haxe.Log.trace;
   
+  static var fix = false; // Hack
+  
 	// Starting point
 	static function main() 
 	{
@@ -155,6 +157,10 @@ class Main
       {
         action = 'build';
         if ( args.length > 1 ) rel = args[1];
+        if ( args.length > 2 ) 
+        {
+          fix = args[2] == 'fix';
+        }
       }
     }
     
@@ -198,18 +204,25 @@ class Main
       // Start loop
       if ( projects.length > 0 )
       {
-        // Create a Thread instead, the program was never being properly quit otherwise
-        var t = Thread.create(gitLoop);
-        
-        //gitLoop();
-        
-        // We wait for a input from the user (simply hit enter)
-        // Couldn't figure out how to "listens" for an interrupt on neko...
-        trace('Waiting for enter...');
-        var input = Sys.stdin().readInt16();
-        trace('All done ${input} ...');
-        
-        t.sendMessage(666);
+        if ( fix )
+        {
+          gitLoop();
+        }
+        else
+        {
+          // Create a Thread instead, the program was never being properly quit otherwise
+          var t = Thread.create(gitLoop);
+          
+          //gitLoop();
+          
+          // We wait for a input from the user (simply hit enter)
+          // Couldn't figure out how to "listens" for an interrupt on neko...
+          trace('Waiting for enter...');
+          var input = Sys.stdin().readInt16();
+          trace('All done ${input} ...');
+          
+          t.sendMessage(666);
+        }
       }
       else
       {
@@ -298,9 +311,21 @@ class Main
   {
     trace('Calling: ${cmd}');
     
-    var p = new Process( cmd, args );
-    p.exitCode(true);
-    p.close();
+    if ( fix && (Sys.systemName() == 'Windows') )
+    {
+      // Mainly for debugging....
+      Sys.command( cmd, args );
+    }
+    else
+    {
+      /*var t = getCall( cmd, args );
+      Sys.print( t );
+      return t;*/
+      
+      var p = new Process( cmd, args );
+      p.exitCode(true);
+      p.close();
+    }
     
     return '';
     
@@ -411,10 +436,12 @@ class Main
     trace('Updating GIT repo...');
     trace('');
     
-    //trace('${Sys.getCwd()}');
+    // Ignore any local changes (dunno why but sometimes in some weird instances I get git 
+    // telling me there's some local changes when it isn't true, maybe some LR/CR, permission issue...
+    // Anyway, we don't ever change anything in those repo on the machine this code run on, so better be safe!
+    call('git reset --hard origin/master');
     
-    //Sys.command('git pull');
-    
+    // Pull
     call('git pull');
     call('git submodule update --init --recursive');
     
