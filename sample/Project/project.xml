@@ -11,7 +11,7 @@
   <assets path="Assets" rename="assets" />
 
   <config:ios deployment="6.0" />
-  <certificate team-id="6DLE5P4U52" />
+  <certificate team-id="P7K4SUSDX6" />
 
   <certificate path="certificates/key.keystore" password="_PASSWORD_" alias="_ALIAS_" alias-password="_ALIAS-PASSWORD_" if="_CHANGE-TO-FINAL_" />
 

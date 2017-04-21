@@ -908,7 +908,7 @@ class Main
     // Create DMG
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
-      call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 350 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}.dmg ${full("Release/app")}');
+      call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}.dmg ${full("Release/app")}');
     }
     
     // Send to server
@@ -970,11 +970,11 @@ class Main
     {
       if ( lime.certificate != null )
       {
-        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}');
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}');
       }
       else
       {
-        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}');
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -o Release -n ${lime.app.file}');
       }
     }
     
