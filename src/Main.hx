@@ -948,8 +948,7 @@ class Main
       var content = File.getContent('${getPath()}/utils/project.pbxproj');
       content = content.replace('::if DEVELOPMENT_TEAM_ID::', '::if APP_FILE::'); // true?
       content = content.replace('::DEVELOPMENT_TEAM_ID::', '${lime.certificate.teamID}');
-      content = content.replace('::if CODE_SIGN_IDENTITY::', '::if APP_FILE::'); // true?
-      content = content.replace('::CODE_SIGN_IDENTITY::', 'iPhone Developer');
+      content = content.replace('::config.ios.identity::', 'iPhone Developer');
       
       createDir('templates_ignore/iphone/PROJ.xcodeproj');
       File.saveContent('templates_ignore/iphone/PROJ.xcodeproj/project.pbxproj', content);
