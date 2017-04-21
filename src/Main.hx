@@ -945,7 +945,6 @@ class Main
       projectXML = projectXML.replace('</project>', '<template path="templates_ignore" /></project>');
       File.saveContent('project.ios.xml', projectXML);
       
-      
       var content = File.getContent('${getPath()}/utils/project.pbxproj');
       content = content.replace('::if DEVELOPMENT_TEAM_ID::', '::if APP_FILE::'); // true?
       content = content.replace('::DEVELOPMENT_TEAM_ID::', '${lime.certificate.teamID}');
