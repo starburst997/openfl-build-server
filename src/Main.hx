@@ -498,6 +498,16 @@ class Main
     }
   }
   
+  // Get full path from CWD
+  static function full( path:String )
+  {
+    var cwd = Sys.getCwd();
+    cwd = cwd.substr(0, cwd.length - 1);
+    
+    var full = '${cwd}/${path}';
+    return full;
+  }
+  
   // Remove a directory and everything inside
   static function removeDir( path:String )
   {
@@ -915,14 +925,6 @@ class Main
     
   }
   
-  // Get full path from CWD
-  static function full( path:String )
-  {
-    var cwd = Sys.getCwd();
-    var full = '${cwd}/${path}';
-    return full.substr(0, full.length-1);
-  }
-  
   // Compile iOS
   static function compileIOS( project:Project, info:ProjectInfo, lime:HXProject )
   {
@@ -934,11 +936,29 @@ class Main
     if ( project.json.legacy )
     {
       // Add support for team-id on legacy project without any modification to lime
+      if ( FileSystem.exists('project.ios.xml') )
+      {
+        FileSystem.deleteFile('project.ios.xml');
+      }
       
+      var projectXML = File.getContent('project.xml');
+      projectXML = projectXML.replace('</project>', '<template path="templates_ignore" /></project>');
+      File.saveContent('project.ios.xml', projectXML);
+      
+      
+      var content = File.getContent('${getPath()}/utils/project.pbxproj');
+      content = content.replace('::if DEVELOPMENT_TEAM_ID::', '::if APP_FILE::'); // true?
+      content = content.replace('::DEVELOPMENT_TEAM_ID::', '${lime.certificate.teamID}');
+      
+      createDir('templates_ignore/iphone/PROJ.xcodeproj');
+      File.saveContent('templates_ignore/iphone/PROJ.xcodeproj/project.pbxproj', content);
       
       // -Dsource-header=0
       // No idea why this is needed...
-      log = call('haxelib run openfl build ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
+      log = call('haxelib run openfl build project.ios.xml ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
+      
+      // Cleanup
+      FileSystem.deleteFile('project.ios.xml');
     }
     else
     {
@@ -952,11 +972,13 @@ class Main
     Sys.print(log);
     trace('');
     
-    // Copy package
+    // Yup, building again with fastlane... (I know, will figure out something better, but currently have an issue with turning the .app into .ipa)
     var bytes:Bytes = null;
     
     if ( project.json.legacy )
     {
+      call('fastlane run recreate_schemes project:Export/ios/${lime.app.file}.xcodeproj');
+      
       if ( lime.certificate != null )
       {
         call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}');
@@ -968,6 +990,8 @@ class Main
     }
     else
     {
+      call('fastlane run recreate_schemes project:Export/ios/final/${lime.app.file}.xcodeproj');
+      
       if ( lime.certificate != null )
       {
         call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}');
