@@ -923,7 +923,7 @@ class Main
     }
     else
     {
-      copyFolder('Export/windows/cpp/bin', 'Release/windows');
+      copyFolder('Export/windows/cpp/final/bin', 'Release/windows');
     }
     
     addRelease( zipFolder('Release/windows'), '${lime.app.file}-windows-${git}.zip' );
