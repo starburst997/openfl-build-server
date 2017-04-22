@@ -19,11 +19,27 @@ import zip.*;
 
 using StringTools;
 
+// Icon definition
+typedef Icon =
+{
+  var name:String;
+  var width:Int;
+  var height:Int;
+};
+
 // Project definition
 typedef Project =
 {
   var json:ProjectJSON;
   var path:String;
+}
+
+// Config JSON, mainly just default values
+typedef Config =
+{
+  var company:String;
+  var website:String;
+  var publisher:String;
 }
 
 // Lime Project XML, very basic processing
@@ -72,6 +88,10 @@ typedef ProjectInfo =
 {
   var folder:String;
   
+  @optional var website:String;
+  @optional var copyright:String;
+  @optional var languages:Array<String>;
+  
   // Replace commands run with those one
   @optional var win:Array<String>;
   @optional var mac:Array<String>;
@@ -107,9 +127,11 @@ class Main
   static var git:String = '';
   static var cwd:String = '';
   static var projects:Array<Project> = null;
+  static var config:Config = null;
   static var oldTrace = haxe.Log.trace;
   
   static var fix = false; // Hack
+  static var test = 0; // Run tests for debugging
   
 	// Starting point
 	static function main() 
@@ -161,6 +183,12 @@ class Main
         {
           fix = args[2] == 'fix';
         }
+      }
+      else if ( args[0] == 'test' )
+      {
+        action = 'build';
+        rel = './projects';
+        if ( (args.length > 1) && (Std.parseInt(args[1]) > 0) ) test = Std.parseInt(args[1]);
       }
     }
     
@@ -285,10 +313,16 @@ class Main
         }
         
         // Trigger if they are different
-        if ( (head != '') && (current != '') && (head != null) && (current != null) && (head != current) )
+        if ( (test > 0) || ((head != '') && (current != '') && (head != null) && (current != null) && (head != current)) )
         {
           trace('Start compilation!');
           compileProject( project );
+        }
+        
+        // Only do one project per test
+        if ( test != 0 )
+        {
+          break;
         }
       }
       
@@ -297,7 +331,16 @@ class Main
       // Wait 30sec...
       Sys.sleep(1);
       //Sys.sleep(30);
+      
+      if ( test != 0 )
+      {
+        break;
+      }
     }
+    
+    trace('');
+    trace('Done!');
+    trace('');
     
     // Trying timer since while loop since to break ctrl+c
     //Sys.sleep(1);
@@ -432,29 +475,33 @@ class Main
   // Compile a project
   static function compileProject( project:Project )
   {
-    // Update GIT repo
-    trace('Updating GIT repo...');
-    trace('');
-    
-    // Ignore any local changes (dunno why but sometimes in some weird instances I get git 
-    // telling me there's some local changes when it isn't true, maybe some LR/CR, permission issue...
-    // Anyway, we don't ever change anything in those repo on the machine this code run on, so better be safe!
-    call('git reset --hard origin/master');
-    
-    // Pull
-    call('git pull');
-    call('git submodule update --init --recursive');
-    
     var head = getCall('git', ['rev-parse', 'HEAD']);
-    var current = getCall('git', ['rev-parse', '@{u}']);
-    trace('${head} - ${current}');
     
-    if ( head != current )
+    if ( test == 0 )
     {
-      separ();
-      trace('- WARNING: Something wrong with git pull... -');
-      separ();
-      return;
+      // Update GIT repo
+      trace('Updating GIT repo...');
+      trace('');
+      
+      // Ignore any local changes (dunno why but sometimes in some weird instances I get git 
+      // telling me there's some local changes when it isn't true, maybe some LR/CR, permission issue...
+      // Anyway, we don't ever change anything in those repo on the machine this code run on, so better be safe!
+      call('git reset --hard origin/master');
+      
+      // Pull
+      call('git pull');
+      call('git submodule update --init --recursive');
+      
+      var current = getCall('git', ['rev-parse', '@{u}']);
+      trace('${head} - ${current}');
+      
+      if ( head != current )
+      {
+        separ();
+        trace('- WARNING: Something wrong with git pull... -');
+        separ();
+        return;
+      }
     }
     
     git = head.substr(0, 7);
@@ -478,12 +525,16 @@ class Main
       separ();
       
       // Delete Release / Export folder (make sure we don't have old assets)
-      trace('Removing Release / Export directory...');
-      removeDir('Release');
-      removeDir('Export'); // Necessary???
+      if ( test == 0 )
+      {
+        trace('Removing Release / Export directory...');
+        removeDir('Release');
+        removeDir('Export'); // Necessary???
+        
+        createDir('Release');
+        createDir('Export');
+      }
       
-      createDir('Release');
-      createDir('Export');
       trace('');
       
       // Get lime project
@@ -495,53 +546,86 @@ class Main
         case 'Windows':
           trace('Compiling for Windows platform...');
           trace('');
-          if ( p.win != null )
+          if ( test != 0 )
           {
-            compile( project, p, limeProject, p.win );
+            if ( test == 1 ) installerWindows( project, p, limeProject );
           }
-          else
+          else 
           {
-            compileHTML5( project, p, limeProject );
-            compileWindows( project, p, limeProject );
+            if ( p.win != null )
+            {
+              compile( project, p, limeProject, p.win );
+            }
+            else
+            {
+              compileHTML5( project, p, limeProject );
+              compileWindows( project, p, limeProject );
+            }
           }
         case 'Mac':
           trace('Compiling for Mac platform...');
           trace('');
-          if ( p.mac != null )
+          if ( test != 0 )
           {
-            compile( project, p, limeProject, p.mac );
+            if ( test == 1 ) installerMac( project, p, limeProject );
           }
-          else
+          else 
           {
-            compileMac( project, p, limeProject );
-            compileIOS( project, p, limeProject );
+            if ( p.mac != null )
+            {
+              compile( project, p, limeProject, p.mac );
+            }
+            else
+            {
+              compileMac( project, p, limeProject );
+              compileIOS( project, p, limeProject );
+            }
           }
         case 'Linux':
           trace('Compiling for Linux platform...');
           trace('');
-          if ( p.linux != null )
+          if ( test != 0 )
           {
-            compile( project, p, limeProject, p.linux );
+            
           }
           else
           {
-            compileLinux( project, p, limeProject );
-            compileAndroid( project, p, limeProject );
+            if ( p.linux != null )
+            {
+              compile( project, p, limeProject, p.linux );
+            }
+            else
+            {
+              compileLinux( project, p, limeProject );
+              compileAndroid( project, p, limeProject );
+            }
           }
       }
       
       separ();
+      
+      // Only do one project per test
+      if ( test != 0 )
+      {
+        break;
+      }
     }
   }
   
   // Get full path from CWD
-  static function full( path:String )
+  static function full( path:String = '' )
   {
     var cwd = Sys.getCwd();
     cwd = cwd.substr(0, cwd.length - 1);
     
-    var full = '${cwd}/${path}';
+    var full = path == '' ? cwd : '${cwd}/${path}';
     return full;
+  }
+  
+  // Windows path
+  static function winPath(path:String)
+  {
+    return path.replace('/', '\\');
   }
   
   // Remove a directory and everything inside
@@ -784,12 +868,14 @@ class Main
     // Package ZIP
     if ( project.json.legacy )
     {
-      addRelease( zipFolder('Export/html5/bin'), '${lime.app.file}-html5-${git}.zip' );
+      copyFolder('Export/html5/bin', 'Release/html5');
     }
     else
     {
-      addRelease( zipFolder('Export/html5/final/bin'), '${lime.app.file}-html5-${git}.zip' );
+      copyFolder('Export/html5/final/bin', 'Release/html5');
     }
+    
+    addRelease( zipFolder('Release/html5'), '${lime.app.file}-html5-${git}.zip' );
     
     // Send to server
     
@@ -827,18 +913,238 @@ class Main
     // Package ZIP
     if ( project.json.legacy )
     {
-      addRelease( zipFolder('Export/windows/cpp/bin'), '${lime.app.file}-windows-${git}.zip' );
+      copyFolder('Export/windows/cpp/bin', 'Release/windows');
     }
     else
     {
-      addRelease( zipFolder('Export/windows/cpp/final/bin'), '${lime.app.file}-windows-${git}.zip' );
+      copyFolder('Export/windows/cpp/bin', 'Release/windows');
     }
     
-    // Create installer
+    addRelease( zipFolder('Release/windows'), '${lime.app.file}-windows-${git}.zip' );
     
+    // Create installer
+    installerWindows( project, info, lime );
     
     // Send to server
     
+  }
+  
+  // Create windows installer
+  static function installerWindows( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    installerNSIS( project, info, lime );
+    installerAPPX( project, info, lime );
+  }
+  static function installerAPPX( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    // Create installer APPX
+    trace('Creating APPX installer for windows');
+    
+    if ( FileSystem.exists('Release/windows/AppxManifest.xml') )
+    {
+      FileSystem.deleteFile('Release/windows/AppxManifest.xml');
+    }
+    
+    emptyDir('Release/windows/uwp');
+    
+    // Create images
+    var squares:Array<Icon> = [
+      {name: 'AppLargeTile.scale-100.png', width: 310, height: 310},
+      {name: 'AppLargeTile.scale-125.png', width: 388, height: 388},
+      {name: 'AppLargeTile.scale-150.png', width: 465, height: 465},
+      {name: 'AppLargeTile.scale-200.png', width: 620, height: 620},
+      {name: 'AppLargeTile.scale-400.png', width: 1240, height: 1240},
+      {name: 'AppList.scale-100.png', width: 44, height: 44},
+      {name: 'AppList.scale-125.png', width: 55, height: 55},
+      {name: 'AppList.scale-150.png', width: 66, height: 66},
+      {name: 'AppList.scale-200.png', width: 88, height: 88},
+      {name: 'AppList.scale-400.png', width: 176, height: 176},
+      {name: 'AppList.targetsize-16.png', width: 16, height: 16},
+      {name: 'AppList.targetsize-16_altform-unplated.png', width: 16, height: 16},
+      {name: 'AppList.targetsize-24.png', width: 24, height: 24},
+      {name: 'AppList.targetsize-24_altform-unplated.png', width: 24, height: 24},
+      {name: 'AppList.targetsize-256.png', width: 256, height: 256},
+      {name: 'AppList.targetsize-256_altform-unplated.png', width: 256, height: 256},
+      {name: 'AppList.targetsize-32.png', width: 32, height: 32},
+      {name: 'AppList.targetsize-32_altform-unplated.png', width: 32, height: 32},
+      {name: 'AppList.targetsize-48.png', width: 48, height: 48},
+      {name: 'AppList.targetsize-48_altform-unplated.png', width: 48, height: 48},
+      {name: 'AppMedTile.scale-100.png', width: 150, height: 150},
+      {name: 'AppMedTile.scale-125.png', width: 188, height: 188},
+      {name: 'AppMedTile.scale-150.png', width: 225, height: 225},
+      {name: 'AppMedTile.scale-200.png', width: 300, height: 300},
+      {name: 'AppMedTile.scale-400.png', width: 600, height: 600},
+      {name: 'AppSmallTile.scale-100.png', width: 71, height: 71},
+      {name: 'AppSmallTile.scale-125.png', width: 89, height: 89},
+      {name: 'AppSmallTile.scale-150.png', width: 107, height: 107},
+      {name: 'AppSmallTile.scale-200.png', width: 142, height: 142},
+      {name: 'AppSmallTile.scale-400.png', width: 284, height: 284},
+      {name: 'AppStoreLogo.scale-100.png', width: 50, height: 50},
+      {name: 'AppStoreLogo.scale-125.png', width: 63, height: 63},
+      {name: 'AppStoreLogo.scale-150.png', width: 75, height: 75},
+      {name: 'AppStoreLogo.scale-200.png', width: 100, height: 100},
+      {name: 'AppStoreLogo.scale-400.png', width: 200, height: 200},
+    ];
+    var wides:Array<Icon> = [
+      {name: 'AppWideTile.scale-100.png', width: 310, height: 150},
+      {name: 'AppWideTile.scale-125.png', width: 388, height: 188},
+      {name: 'AppWideTile.scale-150.png', width: 465, height: 225},
+      {name: 'AppWideTile.scale-200.png', width: 620, height: 300},
+      {name: 'AppWideTile.scale-400.png', width: 1240, height: 600}
+    ];
+    
+    for ( icon in squares )
+    {
+      call('magick convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/windows/uwp/${icon.name}');
+    }
+    for ( icon in wides )
+    {
+      call('magick convert utils/wide.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/windows/uwp/${icon.name}');
+    }
+    
+    // Create script
+    var year = Date.now().getFullYear();
+    var appx = File.getContent('${getPath()}/utils/AppxManifest.xml');
+    
+    appx = appx.replace('::PUBLISHER::', '${config.publisher}');
+    appx = appx.replace('::VERSION::', '${lime.meta.version}.0');
+    appx = appx.replace('::NAME::', '${lime.meta.title}');
+    appx = appx.replace('::FILE::', '${lime.app.file}');
+    
+    // Save script
+    File.saveContent('Release/windows/AppxManifest.xml', appx);
+    
+    // Run script
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/windows');
+    
+    if ( FileSystem.exists('priconfig.xml') ) FileSystem.deleteFile('priconfig.xml');
+    if ( FileSystem.exists('resources.pri') ) FileSystem.deleteFile('resources.pri');
+    if ( FileSystem.exists('resources.scale-125.pri') ) FileSystem.deleteFile('resources.scale-125.pri');
+    if ( FileSystem.exists('resources.scale-150.pri') ) FileSystem.deleteFile('resources.scale-150.pri');
+    if ( FileSystem.exists('resources.scale-200.pri') ) FileSystem.deleteFile('resources.scale-200.pri');
+    if ( FileSystem.exists('resources.scale-400.pri') ) FileSystem.deleteFile('resources.scale-400.pri');
+    
+    call('makepri createconfig /cf priconfig.xml /dq en-US');
+    call('makepri new /pr ${winPath(full())} /cf ${winPath(full("priconfig.xml"))}');
+    
+    if ( FileSystem.exists('priconfig.xml') ) FileSystem.deleteFile('priconfig.xml');
+    
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}');
+    
+    if ( FileSystem.exists('Release/${lime.app.file}-${git}.appx') ) FileSystem.deleteFile('Release/${lime.app.file}-${git}.appx');
+    Sys.command('MakeAppx.exe pack /l /d Release/windows /p Release/${lime.app.file}-${git}.appx');
+    Sys.command('signtool.exe sign -f certificates/my.pfx -fd SHA256 -v Release/${lime.app.file}-${git}.appx');
+  }
+  static function unixPath( path:String )
+  {
+    return path.replace('\\', '/'); 
+  }
+  static function installerNSIS( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    // Create installer NSIS
+    trace('Creating NSIS installer for windows');
+    
+    if ( FileSystem.exists('Release/installer.nsi') )
+    {
+      FileSystem.deleteFile('Release/installer.nsi');
+    }
+    
+    // Use windows backslash
+    var year = Date.now().getFullYear();
+    var nsis = File.getContent('${getPath()}/utils/installer.nsi');
+    nsis = nsis.replace('::GIT::', '${git}');
+    nsis = nsis.replace('::NAME::', '${lime.meta.title}');
+    nsis = nsis.replace('::COMPANY::', '${lime.meta.company}');
+    nsis = nsis.replace('::WEBSITE::', '${info.website == null ? config.website : info.website}');
+    nsis = nsis.replace('::VERSION::', '${lime.meta.version}.0');
+    nsis = nsis.replace('::COPYRIGHT::', '${info.copyright == null ? "Copyright "+year+" - "+config.company : info.copyright}');
+    nsis = nsis.replace('::FILE::', '${lime.app.file}');
+    nsis = nsis.replace('::RELEASE_PATH::', '${winPath(Sys.getCwd()+"Release")}');
+    
+    nsis = nsis.replace('::BANNER::', '${winPath(Sys.getCwd()+"utils/installer.bmp")}');
+    nsis = nsis.replace('::ICO::', '${winPath(Sys.getCwd()+"Release/windows/icon.ico")}');
+    
+    var languages = '';
+    if ( info.languages != null )
+    {
+      for ( language in info.languages )
+      {
+        languages += '!insertmacro MUI_LANGUAGE "${language}"\n';
+      }
+    }
+    else
+    {
+      languages += '!insertmacro MUI_LANGUAGE "English"';
+    }
+    nsis = nsis.replace('::LANGUAGES::', '${languages}');
+    
+    // Files
+    var files = fileDirectoryWindows('Release/windows');
+    nsis = nsis.replace('::FILES::', '${files}');
+    
+    // Deletes
+    var deletes = deleteDirectoryWindows('Release/windows');
+    nsis = nsis.replace('::DELETES::', '${deletes}');
+    
+    // Save script
+    File.saveContent('Release/installer.nsi', nsis);
+    
+    // Run script
+    call('makensis Release/installer.nsi');
+  }
+  static function fileDirectoryWindows( path:String, outPath:String = "$INSTDIR" )
+  {
+    var keep:Array<String> = [];
+    
+    var str = '';
+    str += 'SetOutPath "${outPath}"\n';
+    for ( file in FileSystem.readDirectory(path) )
+    {
+      var p = '${path}/${file}';
+      if ( FileSystem.isDirectory(p) )
+      {
+        keep.push( file );
+      }
+      else
+      {
+        str += 'File "${winPath(full(p))}"\n';
+      }
+    }
+    
+    // Parse directory
+    for ( file in keep )
+    {
+      str += fileDirectoryWindows('${path}/${file}', '${outPath}\\${file}');
+    }
+    
+    return str;
+  }
+  static function deleteDirectoryWindows( path:String, outPath:String = "$INSTDIR" )
+  {
+    var keep:Array<String> = [];
+    
+    var str = '';
+    for ( file in FileSystem.readDirectory(path) )
+    {
+      var p = '${path}/${file}';
+      if ( FileSystem.isDirectory(p) )
+      {
+        keep.push( file );
+      }
+      else
+      {
+        str += 'Delete "${outPath}\\${file}"\n';
+      }
+    }
+    
+    // Parse directory
+    for ( file in keep )
+    {
+      str += deleteDirectoryWindows('${path}/${file}', '${outPath}\\${file}');
+      str += 'RmDir "${outPath}\\${file}"\n';
+    }
+    
+    return str;
   }
   
   // Compile Android
@@ -952,14 +1258,23 @@ class Main
       //copyFolder('Export/mac64/cpp/final/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
     }
     
+    // Installer
+    installerMac( project, info, lime );
+    
+    // Send to server
+    
+  }
+  
+  // Create Mac installer
+  static function installerMac( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    trace('Creating mac installer');
+    
     // Create DMG
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
       call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/${lime.app.file}.app/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}-${git}.dmg ${full("Release/app")}');
     }
-    
-    // Send to server
-    
   }
   
   // Compile iOS
@@ -1078,12 +1393,38 @@ class Main
   // Get projects by reading the specified folder in cwd
   static function getProjects()
   {
-    var projects:Array<Project> = [];
-    for ( file in FileSystem.readDirectory('${PROJECTS}') )
+    // Get default config
+    if ( FileSystem.exists('config.json') )
     {
-      if ( FileSystem.isDirectory('${PROJECTS}/${file}') )
+      try
       {
-        var project = getProject('${PROJECTS}/${file}');
+        config = Json.parse(File.getContent('config.json'));
+      }
+      catch ( e:Dynamic )
+      {
+        trace('Error parsing JSON (config.json): ${e}');
+        
+        return null;
+      }
+    }
+    
+    if ( config == null )
+    {
+      config = 
+      {
+        company: 'FailSafe Games',
+        website: 'https://www.failsafegames.com/',
+        publisher: 'Jean-Denis Boivin'
+      };
+    }
+    
+    // Read directories
+    var projects:Array<Project> = [];
+    for ( file in FileSystem.readDirectory('.') )
+    {
+      if ( FileSystem.isDirectory('${file}') )
+      {
+        var project = getProject('${file}');
         if ( project != null ) projects.push( project );
       }
     }

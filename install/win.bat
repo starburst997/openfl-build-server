@@ -27,4 +27,6 @@ echo git submodule add git@github.com:starburst997/openfl-sample-1.git
 echo _
 echo Start the script run.sh using `git bash` (windows cmd doesn't seem to works well...)
 echo _
+echo Install NSIS
+echo _
 @pause

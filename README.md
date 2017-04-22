@@ -1,6 +1,8 @@
 # openfl-build-server
 My attempt to automate the build process of my openfl projects (actually could be adapted to any project)
 
+*It is actually a gigantic pill of crap so don't use it right now, but it does suits my need*
+
 The idea being that you have 3 VMs (I'm using Virtual Box): Windows (7), Linux (Ubuntu), Mac (Sierra). On a single machine (I'm using Windows 10), connected to the internet and open 24 / 7.
 
 This repo does not include the files or instructions to setup the VMs, you need to install haxe / openfl and makes sure you can
