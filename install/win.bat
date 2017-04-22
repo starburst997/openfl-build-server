@@ -1,7 +1,7 @@
 @echo off
 
 echo _
-echo Makes sure you have GIT / NPM installed
+echo Makes sure you have GIT / NPM / ImageMagick installed
 echo Have your ssh key saved in '~/.ssh/id_rsa'
 echo _
 @pause
