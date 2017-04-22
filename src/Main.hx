@@ -476,6 +476,7 @@ class Main
   static function compileProject( project:Project )
   {
     var head = getCall('git', ['rev-parse', 'HEAD']);
+    var current = '';
     
     if ( test == 0 )
     {
@@ -492,7 +493,8 @@ class Main
       call('git pull');
       call('git submodule update --init --recursive');
       
-      var current = getCall('git', ['rev-parse', '@{u}']);
+      head = getCall('git', ['rev-parse', 'HEAD']);
+      current = getCall('git', ['rev-parse', '@{u}']);
       trace('${head} - ${current}');
       
       if ( head != current )
