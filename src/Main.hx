@@ -879,6 +879,10 @@ class Main
     
     addRelease( zipFolder('Release/html5'), '${lime.app.file}-html5-${git}.zip' );
     
+    // Add test run
+    var html5 = File.getContent('${getPath()}/utils/html5.sh');
+    File.saveContent('Release/html5.sh', html5);
+    
     // Send to server
     
   }
