@@ -1279,7 +1279,7 @@ class Main
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
       // Sign
-      call('sudo codesign -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" --deep -f --entitlements "${getPath()}/utils/mac.plist" "Release/app/${lime.app.file}.app/"');
+      call('sudo codesign --entitlements "${getPath()}/utils/mac.plist" -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "3rd Party Mac Developer Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
