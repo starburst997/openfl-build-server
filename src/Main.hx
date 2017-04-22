@@ -1276,9 +1276,15 @@ class Main
   {
     trace('Creating mac installer');
     
-    // Create DMG
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
+      // Sign
+      call('sudo codesign -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" --deep -f --entitlements "${getPath()}/utils/mac.plist" "Release/app/${lime.app.file}.app/"');
+      
+      // Create PKG
+      call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "3rd Party Mac Developer Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
+      
+      // Create DMG
       call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/${lime.app.file}.app/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}-${git}.dmg ${full("Release/app")}');
     }
   }
