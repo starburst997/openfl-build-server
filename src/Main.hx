@@ -1230,7 +1230,7 @@ class Main
     trace("- MAC -");
     
     // DEPLOY
-    // fastlane deliver -u failsafegames@gmail.com --pkg Release/${lime.app.file}-store-${git}.pkg
+    // fastlane deliver -u failsafegames@gmail.com --pkg Release/${lime.app.file}-store-${git}.pkg --force
     
     // Some issue with the app signing
     call('sudo rm -Rf "Release/app"');
@@ -1312,12 +1312,12 @@ class Main
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
       // Sign
-      var plist = File.getContent('${getPath()}/utils/mac.plist');
+      /*var plist = File.getContent('${getPath()}/utils/mac.plist');
       File.saveContent('Release/app/${lime.app.file}.app/Contents/Entitlements.plist', plist);
-      File.saveContent('Release/store/${lime.app.file}.app/Contents/Entitlements.plist', plist);
+      File.saveContent('Release/store/${lime.app.file}.app/Contents/Entitlements.plist', plist);*/
       
-      call('sudo codesign --deep --entitlements "Release/app/${lime.app.file}.app/Contents/Entitlements.plist" -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
-      call('sudo codesign --deep --entitlements "Release/store/${lime.app.file}.app/Contents/Entitlements.plist" -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
+      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "Release/app/${lime.app.file}.app/Contents/Entitlements.plist"');
+      call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "Release/store/${lime.app.file}.app/Contents/Entitlements.plist"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "Developer ID Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
