@@ -1257,6 +1257,7 @@ class Main
     
     // Call command instead... Seems like some permission are lost or I dunno...
     createDir('Release/app');
+    createDir('Release/store');
     if ( project.json.legacy )
     {
       call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
@@ -1285,15 +1286,18 @@ class Main
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
       // Sign
-      call('sudo codesign --entitlements "${getPath()}/utils/mac.plist" -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
-      call('sudo codesign --entitlements "${getPath()}/utils/mac.plist" -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
+      call('sudo codesign --deep --entitlements "${getPath()}/utils/mac.plist" -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
+      call('sudo codesign --deep --entitlements "${getPath()}/utils/mac.plist" -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "Developer ID Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
       call('productbuild --component "Release/store/${lime.app.file}.app/" /Applications --sign "3rd Party Mac Developer Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/store/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-store-${git}.pkg"');
       
       // Create DMG
-      call('${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/${lime.app.file}.app/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}-${git}.dmg ${full("Release/app")}');
+      call('sudo ${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/${lime.app.file}.app/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}-${git}.dmg ${full("Release/app")}');
+      
+      // Sign DMG
+      call('codesign -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/${lime.app.file}-${git}.dmg"');
     }
   }
   
