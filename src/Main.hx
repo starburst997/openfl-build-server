@@ -1374,6 +1374,7 @@ class Main
       
       // Require Fullscreen
       var infoPlist = File.getContent('${getPath()}/utils/info.plist');
+      FileSystem.createDirectory('templates_ignore/iphone/PROJ');
       File.saveContent('templates_ignore/iphone/PROJ/PROJ-Info.plist', infoPlist);
       
       // -Dsource-header=0
