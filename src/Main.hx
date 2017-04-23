@@ -1229,6 +1229,9 @@ class Main
   {
     trace("- MAC -");
     
+    // DEPLOY
+    // fastlane deliver -u failsafegames@gmail.com --pkg Release/${lime.app.file}-store-${git}.pkg
+    
     // Some issue with the app signing
     call('sudo rm -Rf "Release/app"');
     call('sudo rm -Rf "Release/store"');
@@ -1249,25 +1252,24 @@ class Main
       if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'mac') )
       {
         xml = xml.replace('${lime.meta.pkg}', node.att.resolve('package'));
-        trace('****** YUP');
       }
     }
-    File.saveContent('project.ios.xml', xml);
-
+    File.saveContent('project.mac.xml', xml);
+    
     // Build
     if ( project.json.legacy )
     {
-      log = call('haxelib run openfl build project.ios.xml mac -verbose -Dlegacy > Release/mac.log');
+      log = call('haxelib run openfl build project.mac.xml mac -verbose -Dlegacy > Release/mac.log');
     }
     else
     {
       createDir('Export/mac64/cpp/final/haxe/_generated');
-      log = call('haxelib run openfl build project.ios.xml mac -verbose -final > Release/mac.log');
+      log = call('haxelib run openfl build project.mac.xml mac -verbose -final > Release/mac.log');
     }
     
-    if ( FileSystem.exists('project.ios.xml') )
+    if ( FileSystem.exists('project.mac.xml') )
     {
-      //FileSystem.deleteFile('project.ios.xml');
+      FileSystem.deleteFile('project.mac.xml');
     }
     
     log = getLog('Release/mac.log');
@@ -1310,8 +1312,14 @@ class Main
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
       // Sign
-      call('sudo codesign --deep --entitlements "${getPath()}/utils/mac.plist" -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
-      call('sudo codesign --deep --entitlements "${getPath()}/utils/mac.plist" -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
+      var plist = File.getContent('${getPath()}/utils/mac.plist');
+      File.saveContent('Release/app/${lime.app.file}.app/Contents/Entitlements.plist', plist);
+      File.saveContent('Release/store/${lime.app.file}.app/Contents/Entitlements.plist', plist);
+      
+      //call('sudo codesign --deep --entitlements "${getPath()}/utils/mac.plist" -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
+      //call('sudo codesign --deep --entitlements "${getPath()}/utils/mac.plist" -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
+      call('sudo codesign --deep -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
+      call('sudo codesign --deep -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "Developer ID Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
