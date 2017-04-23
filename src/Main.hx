@@ -1372,6 +1372,10 @@ class Main
       createDir('templates_ignore/iphone/PROJ.xcodeproj');
       File.saveContent('templates_ignore/iphone/PROJ.xcodeproj/project.pbxproj', content);
       
+      // Require Fullscreen
+      var infoPlist = File.getContent('${getPath()}/utils/info.plist');
+      File.saveContent('templates_ignore/iphone/PROJ/PROJ-Info.plist', infoPlist);
+      
       // -Dsource-header=0
       // No idea why this is needed...
       log = call('haxelib run openfl build project.ios.xml ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
@@ -1398,14 +1402,14 @@ class Main
     if ( project.json.legacy )
     {
       // Add fullscreen required for ios submission (yup another hack, but whatev, I just want this to works...)
-      if ( FileSystem.exists('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist') )
+      /*if ( FileSystem.exists('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist') )
       {
         var plist = File.getContent('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist');
         FileSystem.deleteFile('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist');
         
         plist = plist.replace('</dict>', '<key>UIRequiresFullScreen</key><true/></dict>');
         File.saveContent('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist', plist);
-      }
+      }*/
       
       call('fastlane run recreate_schemes project:Export/ios/${lime.app.file}.xcodeproj');
       
