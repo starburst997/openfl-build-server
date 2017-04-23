@@ -1220,6 +1220,9 @@ class Main
     
     addRelease( bytes, '${lime.app.file}-${git}.apk' );
     
+    // Random script
+    
+    
     // Send to server
     
   }
@@ -1303,9 +1306,11 @@ class Main
     // Installer
     installerMac( project, info, lime );
     
-    // Deploy mac app
-    // fastlane spaceauth -u failsafegames@gmail.com
-    //deployMac( 
+    // Deploy mac script
+    var script = File.getContent('${getPath()}/utils/deploy_mac.sh');
+    script = script.replace('::FILE::', '${lime.app.file}-store-${git}.pkg');
+    File.saveContent('Release/deploy_mac.sh', script);
+    call('chmod +x Release/deploy_mac.sh');
     
     // Send to server
     
@@ -1436,6 +1441,27 @@ class Main
         call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -o Release -n ${lime.app.file}-${git}');
       }
     }
+    
+    // Test ios script
+    var script = File.getContent('${getPath()}/utils/ios.sh');
+    
+    if ( project.json.legacy )
+    {
+      script = script.replace('::FILE::', '../Export/ios/build/Release-iphoneos/${lime.app.file}.app');
+    }
+    else
+    {
+      script = script.replace('::FILE::', '../Export/ios/final/build/Release-iphoneos/${lime.app.file}.app');
+    }
+    
+    File.saveContent('Release/ios.sh', script);
+    call('chmod +x Release/ios.sh');
+    
+    // Deploy ios script
+    var script = File.getContent('${getPath()}/utils/deploy_ios.sh');
+    script = script.replace('::FILE::', '${lime.app.file}-${git}.ipa');
+    File.saveContent('Release/deploy_ios.sh', script);
+    call('chmod +x Release/deploy_ios.sh');
     
     // Send to server
     
