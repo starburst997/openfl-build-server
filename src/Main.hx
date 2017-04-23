@@ -1286,22 +1286,19 @@ class Main
     createDir('Release/store');
     if ( project.json.legacy )
     {
-      //FileSystem.deleteFile('Export/mac64/cpp/bin/${lime.app.file}.app/Contents/Entitlements.plist');
-      call('sudo rm Export/mac64/cpp/bin/${lime.app.file}.app/Contents/Entitlements.plist');
-      
       call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
       call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/store/${lime.app.file}.app"');
       //copyFolder('Export/mac64/cpp/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
     }
     else
     {
-      //FileSystem.deleteFile('Export/mac64/cpp/final/bin/${lime.app.file}.app/Contents/Entitlements.plist');
-      call('sudo rm Export/mac64/cpp/final/bin/${lime.app.file}.app/Contents/Entitlements.plist');
-      
       call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
       call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/store/${lime.app.file}.app"');
       //copyFolder('Export/mac64/cpp/final/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
     }
+    
+    call('sudo rm Release/app/${lime.app.file}.app/Contents/Entitlements.plist');
+    call('sudo rm Release/store/${lime.app.file}.app/Contents/Entitlements.plist');
     
     // Installer
     installerMac( project, info, lime );
