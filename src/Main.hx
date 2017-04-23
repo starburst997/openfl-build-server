@@ -1252,6 +1252,7 @@ class Main
       if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'mac') )
       {
         xml = xml.replace('${lime.meta.pkg}', node.att.resolve('package'));
+        trace('******** FOUND');
       }
     }
     File.saveContent('project.mac.xml', xml);
@@ -1269,7 +1270,7 @@ class Main
     
     if ( FileSystem.exists('project.mac.xml') )
     {
-      //FileSystem.deleteFile('project.mac.xml');
+      FileSystem.deleteFile('project.mac.xml');
     }
     
     log = getLog('Release/mac.log');
