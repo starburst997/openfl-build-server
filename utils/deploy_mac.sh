@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 echo .
 echo Makes sure your sessions is up to date with this command!
 echo .
