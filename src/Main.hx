@@ -1252,7 +1252,6 @@ class Main
       if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'mac') )
       {
         xml = xml.replace('${lime.meta.pkg}', node.att.resolve('package'));
-        trace('******** FOUND');
       }
     }
     File.saveContent('project.mac.xml', xml);
@@ -1317,10 +1316,8 @@ class Main
       File.saveContent('Release/app/${lime.app.file}.app/Contents/Entitlements.plist', plist);
       File.saveContent('Release/store/${lime.app.file}.app/Contents/Entitlements.plist', plist);
       
-      //call('sudo codesign --deep --entitlements "${getPath()}/utils/mac.plist" -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
-      //call('sudo codesign --deep --entitlements "${getPath()}/utils/mac.plist" -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
-      call('sudo codesign --deep -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
-      call('sudo codesign --deep -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
+      call('sudo codesign --deep --entitlements "Release/app/${lime.app.file}.app/Contents/Entitlements.plist" -v -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/app/${lime.app.file}.app/"');
+      call('sudo codesign --deep --entitlements "Release/store/${lime.app.file}.app/Contents/Entitlements.plist" -v -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" "Release/store/${lime.app.file}.app/"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "Developer ID Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
