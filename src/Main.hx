@@ -1236,14 +1236,38 @@ class Main
     // Compile
     var log:String = '';
     
+    // Weird issue with package name
+    if ( FileSystem.exists('project.mac.xml') )
+    {
+      FileSystem.deleteFile('project.mac.xml');
+    }
+    var xml:String = File.getContent('project.xml');
+    
+    var fast = new Fast( Xml.parse(xml).firstElement() );
+    for ( node in fast.nodes.meta )
+    {
+      if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'mac') )
+      {
+        xml = xml.replace('${lime.meta.pkg}', node.att.resolve('package'));
+        trace('****** YUP');
+      }
+    }
+    File.saveContent('project.ios.xml', xml);
+
+    // Build
     if ( project.json.legacy )
     {
-      log = call('haxelib run openfl build mac -verbose -Dlegacy > Release/mac.log');
+      log = call('haxelib run openfl build project.ios.xml mac -verbose -Dlegacy > Release/mac.log');
     }
     else
     {
       createDir('Export/mac64/cpp/final/haxe/_generated');
-      log = call('haxelib run openfl build mac -verbose -final > Release/mac.log');
+      log = call('haxelib run openfl build project.ios.xml mac -verbose -final > Release/mac.log');
+    }
+    
+    if ( FileSystem.exists('project.ios.xml') )
+    {
+      //FileSystem.deleteFile('project.ios.xml');
     }
     
     log = getLog('Release/mac.log');
