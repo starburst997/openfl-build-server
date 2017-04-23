@@ -1286,12 +1286,16 @@ class Main
     createDir('Release/store');
     if ( project.json.legacy )
     {
+      FileSystem.deleteFile('Export/mac64/cpp/bin/${lime.app.file}.app/Contents/Entitlements.plist');
+      
       call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
       call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/store/${lime.app.file}.app"');
       //copyFolder('Export/mac64/cpp/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
     }
     else
     {
+      FileSystem.deleteFile('Export/mac64/cpp/final/bin/${lime.app.file}.app/Contents/Entitlements.plist');
+      
       call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
       call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/store/${lime.app.file}.app"');
       //copyFolder('Export/mac64/cpp/final/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
@@ -1316,8 +1320,8 @@ class Main
       File.saveContent('Release/app/${lime.app.file}.app/Contents/Entitlements.plist', plist);
       File.saveContent('Release/store/${lime.app.file}.app/Contents/Entitlements.plist', plist);*/
       
-      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "Release/app/${lime.app.file}.app/Contents/Entitlements.plist"');
-      call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "Release/store/${lime.app.file}.app/Contents/Entitlements.plist"');
+      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "${getPath()}/utils/mac.plist"');
+      call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "${getPath()}/utils/mac.plist"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "Developer ID Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
