@@ -1230,8 +1230,8 @@ class Main
     trace("- MAC -");
     
     // Some issue with the app signing
-    call('rm -Rf "Release/app"');
-    call('rm -Rf "Release/store"');
+    call('sudo rm -Rf "Release/app"');
+    call('sudo rm -Rf "Release/store"');
     
     // Compile
     var log:String = '';
