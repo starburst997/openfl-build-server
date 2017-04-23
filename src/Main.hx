@@ -1314,11 +1314,17 @@ class Main
     
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
-      // Sign
-      /*var plist = File.getContent('${getPath()}/utils/mac.plist');
-      File.saveContent('Release/app/${lime.app.file}.app/Contents/Entitlements.plist', plist);
-      File.saveContent('Release/store/${lime.app.file}.app/Contents/Entitlements.plist', plist);*/
+      // Replace version
+      var plist = File.getContent('Release/app/${lime.app.file}.app/Contents/Info.plist');
       
+      call('sudo rm Release/app/${lime.app.file}.app/Contents/Info.plist');
+      call('sudo rm Release/store/${lime.app.file}.app/Contents/Info.plist');
+      
+      plist = plist.replace('1.0.0', '${lime.meta.version}');
+      File.saveContent('Release/app/${lime.app.file}.app/Contents/Info.plist', plist);
+      File.saveContent('Release/store/${lime.app.file}.app/Contents/Info.plist', plist);
+      
+      // Sign
       call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "${getPath()}/utils/mac.plist"');
       call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "${getPath()}/utils/mac.plist"');
       
