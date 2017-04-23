@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:build="http://schemas.microsoft.com/developer/appx/2015/build" IgnorableNamespaces="uap mp build">
+  <Identity Name="::KEY_IDENTITY::" Version="::VERSION::" Publisher="::KEY_PUBLISHER::"/>
+  <mp:PhoneIdentity PhoneProductId="e8786e1e-b1a5-b0f1-bfe3-34bbfd890cde" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <Properties>
+    <DisplayName>::NAME::</DisplayName>
+    <PublisherDisplayName>::PUBLISHER::</PublisherDisplayName>
+    <!--<Logo>uwp\AppStoreLogo.png</Logo>-->
+    <Logo>uwp\AppStoreLogo.scale-100.png</Logo>
+  </Properties>
+  <!--<Resources>
+    <Resource Language="en-us" />
+    <Resource uap:Scale="100" />
+    <Resource uap:Scale="125" />
+    <Resource uap:Scale="150" />
+    <Resource uap:Scale="200" />
+    <Resource uap:Scale="400" />
+  </Resources>-->
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.10069.0" MaxVersionTested="10.0.10069.0"/>
+  </Dependencies>
+  <Resources>
+    <Resource Language="en-us"/>
+  </Resources>
+  <Applications>
+    <Application Id="::FILE::" StartPage="ms-appx-web:///index.html">
+      <uap:ApplicationContentUriRules>
+        <uap:Rule Type="include" WindowsRuntimeAccess="none" Match="ms-appx-web:///" />
+      </uap:ApplicationContentUriRules>
+
+      <!--<uap:VisualElements DisplayName="::NAME::" Description="::NAME::" BackgroundColor="transparent" Square150x150Logo="uwp\AppMedTile.png" Square44x44Logo="uwp\AppList.png">
+        <uap:DefaultTile Wide310x150Logo="uwp\AppWideTile.png" Square310x310Logo="uwp\AppLargeTile.png" Square71x71Logo="uwp\AppSmallTile.png">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo" />
+            <uap:ShowOn Tile="wide310x150Logo" />
+            <uap:ShowOn Tile="square310x310Logo" />
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile>
+      </uap:VisualElements>-->
+
+      <uap:VisualElements DisplayName="::NAME::" Description="::NAME::" BackgroundColor="transparent" Square150x150Logo="uwp\AppMedTile.scale-100.png" Square44x44Logo="uwp\AppList.scale-100.png">
+        <!--<uap:SplashScreen Image="uwp\AppWideTile.scale-200.png"/>-->
+        <uap:DefaultTile Wide310x150Logo="uwp\AppWideTile.scale-100.png" Square310x310Logo="uwp\AppLargeTile.scale-100.png" Square71x71Logo="uwp\AppSmallTile.scale-100.png">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo" />
+            <uap:ShowOn Tile="wide310x150Logo" />
+            <uap:ShowOn Tile="square310x310Logo" />
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile>
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient"/>
+    <Capability Name="privateNetworkClientServer"/>
+    <!--<DeviceCapability Name="microphone" />
+    <DeviceCapability Name="location" />
+    <DeviceCapability Name="webcam" />-->
+  </Capabilities>
+</Package>

@@ -112,6 +112,9 @@ typedef Key =
   var password:String;
   var alias:String;
   var aliasPassword:String;
+  var identity:String;
+  var publisher:String;
+  var family:String;
 }
 
 /**
@@ -551,6 +554,7 @@ class Main
           if ( test != 0 )
           {
             if ( test == 1 ) installerWindows( project, p, limeProject );
+            if ( test == 2 ) installerHTML5Windows( project, p, limeProject );
           }
           else 
           {
@@ -930,6 +934,7 @@ class Main
     
     // Create installer
     installerWindows( project, info, lime );
+    installerHTML5Windows( project, info, lime );
     
     // Send to server
     
@@ -940,6 +945,215 @@ class Main
   {
     installerNSIS( project, info, lime );
     installerAPPX( project, info, lime );
+  }
+  static function installerHTML5Windows( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    //installerCRX( project, info, lime );
+    installerHTML5APPX( project, info, lime );
+  }
+  static function installerCRX( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    // Create installer APPX
+    trace('Creating HTML5 CRX installer for windows');
+    
+    removeDir('Release/html5-crx');
+    copyFolder('Release/html5', 'Release/html5-crx');
+    
+    // Find the first <script> we need to replace
+    var html = File.getContent('Release/html5-crx/index.html');
+    
+    // Fix 1
+    var r1 = ~/(<script>\n[^<]*<\/script>)/s;
+    if ( r1.match(html) )
+    {
+      var m = r1.matched(0);
+      var n = m.replace('<script>', '').replace('</script>', '');
+      
+      if ( FileSystem.exists('Release/html5-crx/fix1.js') ) FileSystem.deleteFile('Release/html5-crx/fix1.js');
+      File.saveContent('Release/html5-crx/fix1.js', n);
+      
+      html = html.replace(m, '<script type="text/javascript" src="./fix1.js"></script>');
+    }
+    
+    // Fix 2
+    var r2 = ~/(<script type="text\/javascript">\n[^<]*<\/script>)/s;
+    if ( r2.match(html) )
+    {
+      var m = r2.matched(0);
+      var n = m.replace('<script type="text/javascript">', '').replace('</script>', '');
+      
+      if ( FileSystem.exists('Release/html5-crx/fix2.js') ) FileSystem.deleteFile('Release/html5-crx/fix2.js');
+      File.saveContent('Release/html5-crx/fix2.js', n);
+      
+      html = html.replace(m, '<script type="text/javascript" src="./fix2.js"></script>');
+    }
+    
+    FileSystem.deleteFile('Release/html5-crx/index.html');
+    File.saveContent('Release/html5-crx/index.html', html);
+    
+    // Create images
+    var squares:Array<Icon> = [
+      {name: 'icon_16.png', width: 16, height: 16},
+      {name: 'icon_128.png', width: 128, height: 128}
+    ];
+    
+    for ( icon in squares )
+    {
+      call('magick convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/html5-crx/${icon.name}');
+    }
+    
+    // Manifest
+    var manifest = File.getContent('${getPath()}/utils/manifest.json');
+    
+    manifest = manifest.replace('::PUBLISHER::', '${config.publisher}');
+    manifest = manifest.replace('::VERSION::', '${lime.meta.version}.0');
+    manifest = manifest.replace('::NAME::', '${lime.meta.title}');
+    manifest = manifest.replace('::FILE::', '${lime.app.file}');
+    
+    File.saveContent('Release/html5-crx/manifest.json', manifest);
+    
+    // Command
+    
+  }
+  static function installerHTML5APPX( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    // Create installer APPX
+    trace('Creating HTML5 APPX installer for windows');
+    
+    removeDir('Release/html5-appx');
+    copyFolder('Release/html5', 'Release/html5-appx');
+    
+    FileSystem.createDirectory('Release/html5-appx/uwp');
+    
+    // Find the first <script> we need to replace
+    /*var html = File.getContent('Release/html5-appx/index.html');
+    var js = File.getContent('Release/html5-appx/${lime.app.file}.js');
+    
+    html = html.replace('<script type="text/javascript" src="./${lime.app.file}.js"></script>', '');
+    
+    // Fix 1
+    var r1 = ~/(<script>\n[^<]*<\/script>)/s;
+    if ( r1.match(html) )
+    {
+      var m = r1.matched(0);
+      var n = m.replace('<script>', '').replace('</script>', '');
+      
+      js += '\n' + n;
+      
+      html = html.replace(m, '');
+    }
+    
+    // Fix 2
+    var r2 = ~/(<script type="text\/javascript">\n[^<]*<\/script>)/s;
+    if ( r2.match(html) )
+    {
+      var m = r2.matched(0);
+      var n = m.replace('<script type="text/javascript">', '').replace('</script>', '');
+      
+      js += '\n' + n;
+      
+      html = html.replace(m, '<script type="text/javascript" src="./${lime.app.file}.js"></script>');
+    }
+    
+    FileSystem.deleteFile('Release/html5-appx/index.html');
+    File.saveContent('Release/html5-appx/index.html', html);
+    
+    FileSystem.deleteFile('Release/html5-appx/${lime.app.file}.js');
+    File.saveContent('Release/html5-appx/${lime.app.file}.js', js);*/
+    
+    // Create images
+    var squares:Array<Icon> = [
+      {name: 'AppLargeTile.scale-100.png', width: 310, height: 310},
+      {name: 'AppLargeTile.scale-125.png', width: 388, height: 388},
+      {name: 'AppLargeTile.scale-150.png', width: 465, height: 465},
+      {name: 'AppLargeTile.scale-200.png', width: 620, height: 620},
+      {name: 'AppLargeTile.scale-400.png', width: 1240, height: 1240},
+      {name: 'AppList.scale-100.png', width: 44, height: 44},
+      {name: 'AppList.scale-125.png', width: 55, height: 55},
+      {name: 'AppList.scale-150.png', width: 66, height: 66},
+      {name: 'AppList.scale-200.png', width: 88, height: 88},
+      {name: 'AppList.scale-400.png', width: 176, height: 176},
+      {name: 'AppList.targetsize-16.png', width: 16, height: 16},
+      {name: 'AppList.targetsize-16_altform-unplated.png', width: 16, height: 16},
+      {name: 'AppList.targetsize-24.png', width: 24, height: 24},
+      {name: 'AppList.targetsize-24_altform-unplated.png', width: 24, height: 24},
+      {name: 'AppList.targetsize-256.png', width: 256, height: 256},
+      {name: 'AppList.targetsize-256_altform-unplated.png', width: 256, height: 256},
+      {name: 'AppList.targetsize-32.png', width: 32, height: 32},
+      {name: 'AppList.targetsize-32_altform-unplated.png', width: 32, height: 32},
+      {name: 'AppList.targetsize-48.png', width: 48, height: 48},
+      {name: 'AppList.targetsize-48_altform-unplated.png', width: 48, height: 48},
+      {name: 'AppMedTile.scale-100.png', width: 150, height: 150},
+      {name: 'AppMedTile.scale-125.png', width: 188, height: 188},
+      {name: 'AppMedTile.scale-150.png', width: 225, height: 225},
+      {name: 'AppMedTile.scale-200.png', width: 300, height: 300},
+      {name: 'AppMedTile.scale-400.png', width: 600, height: 600},
+      {name: 'AppSmallTile.scale-100.png', width: 71, height: 71},
+      {name: 'AppSmallTile.scale-125.png', width: 89, height: 89},
+      {name: 'AppSmallTile.scale-150.png', width: 107, height: 107},
+      {name: 'AppSmallTile.scale-200.png', width: 142, height: 142},
+      {name: 'AppSmallTile.scale-400.png', width: 284, height: 284},
+      {name: 'AppStoreLogo.scale-100.png', width: 50, height: 50},
+      {name: 'AppStoreLogo.scale-125.png', width: 63, height: 63},
+      {name: 'AppStoreLogo.scale-150.png', width: 75, height: 75},
+      {name: 'AppStoreLogo.scale-200.png', width: 100, height: 100},
+      {name: 'AppStoreLogo.scale-400.png', width: 200, height: 200},
+    ];
+    var wides:Array<Icon> = [
+      {name: 'AppWideTile.scale-100.png', width: 310, height: 150},
+      {name: 'AppWideTile.scale-125.png', width: 388, height: 188},
+      {name: 'AppWideTile.scale-150.png', width: 465, height: 225},
+      {name: 'AppWideTile.scale-200.png', width: 620, height: 300},
+      {name: 'AppWideTile.scale-400.png', width: 1240, height: 600}
+    ];
+    
+    for ( icon in squares )
+    {
+      call('magick convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/html5-appx/uwp/${icon.name}');
+    }
+    for ( icon in wides )
+    {
+      call('magick convert utils/wide.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/html5-appx/uwp/${icon.name}');
+    }
+    
+    // Create script
+    var year = Date.now().getFullYear();
+    var appx = File.getContent('${getPath()}/utils/AppxManifest-html5.xml');
+    
+    var key = readKey();
+    appx = appx.replace('::KEY_IDENTITY::', '${key.identity}');
+    appx = appx.replace('::KEY_PUBLISHER::', '${key.publisher}');
+    appx = appx.replace('::KEY_FAMILY::', '${key.family}');
+    
+    appx = appx.replace('::PUBLISHER::', '${config.publisher}');
+    appx = appx.replace('::VERSION::', '${lime.meta.version}.0');
+    appx = appx.replace('::NAME::', '${lime.meta.title}');
+    appx = appx.replace('::FILE::', '${lime.app.file}');
+    
+    // Save script
+    File.saveContent('Release/html5-appx/AppxManifest.xml', appx);
+    
+    // Run script
+    // Reaaallllyyyyy weeeird!!!! I get security errors when running makepri...... dunno why on getImageData....
+    /*Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/html5-appx');
+    
+    if ( FileSystem.exists('priconfig.xml') ) FileSystem.deleteFile('priconfig.xml');
+    if ( FileSystem.exists('resources.pri') ) FileSystem.deleteFile('resources.pri');
+    if ( FileSystem.exists('resources.scale-125.pri') ) FileSystem.deleteFile('resources.scale-125.pri');
+    if ( FileSystem.exists('resources.scale-150.pri') ) FileSystem.deleteFile('resources.scale-150.pri');
+    if ( FileSystem.exists('resources.scale-200.pri') ) FileSystem.deleteFile('resources.scale-200.pri');
+    if ( FileSystem.exists('resources.scale-400.pri') ) FileSystem.deleteFile('resources.scale-400.pri');
+    
+    call('makepri createconfig /cf priconfig.xml /dq en-US');
+    call('makepri new /pr ${winPath(full())} /cf ${winPath(full("priconfig.xml"))}');
+    
+    if ( FileSystem.exists('priconfig.xml') ) FileSystem.deleteFile('priconfig.xml');
+    
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}');*/
+    
+    if ( FileSystem.exists('Release/${lime.app.file}-html5-${git}.appx') ) FileSystem.deleteFile('Release/${lime.app.file}-html5-${git}.appx');
+    Sys.command('MakeAppx.exe pack /l /d Release/html5-appx /p Release/${lime.app.file}-html5-${git}.appx');
+    Sys.command('signtool.exe sign -f certificates/my.pfx -fd SHA256 -v Release/${lime.app.file}-html5-${git}.appx');
   }
   static function installerAPPX( project:Project, info:ProjectInfo, lime:HXProject )
   {
