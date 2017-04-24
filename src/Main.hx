@@ -1793,7 +1793,7 @@ class Main
     }
     
     // Control file
-    var size = getCall('du -ks Release/deb|cut -f 1');
+    var size = getCall('du -ks Release/deb|cut -f 1').replace('\\n', '');
     var control = File.getContent('${getPath()}/utils/deb/control');
     control = control.replace('::PUBLISHER::', '${config.publisher}');
     control = control.replace('::VERSION::', '${lime.meta.version}');
@@ -1808,7 +1808,10 @@ class Main
     
     // Create portable
     File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop', desktop);
-    call('tar -cvjSf Release/${lime.app.file}_${git}_x64.tar.bz2 Release/deb/opt');
+    
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/deb/opt');
+    call('tar -cvjSf ../../${lime.app.file}_${git}_x64.tar.bz2 .');
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}');
   }
   
   // Get projects by reading the specified folder in cwd
