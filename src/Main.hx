@@ -1793,7 +1793,7 @@ class Main
     }
     
     // Control file
-    var size = getCall('du -ks Release/deb|cut -f 1').replace('\\n', '');
+    var size = getCall('du -ks Release/deb|cut -f 1').replace('\n', '');
     var control = File.getContent('${getPath()}/utils/deb/control');
     control = control.replace('::PUBLISHER::', '${config.publisher}');
     control = control.replace('::VERSION::', '${lime.meta.version}');
