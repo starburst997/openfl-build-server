@@ -949,7 +949,7 @@ class Main
   static function installerHTML5Windows( project:Project, info:ProjectInfo, lime:HXProject )
   {
     installerCRX( project, info, lime );
-    //installerHTML5APPX( project, info, lime );
+    installerHTML5APPX( project, info, lime );
   }
   static function installerCRX( project:Project, info:ProjectInfo, lime:HXProject )
   {
