@@ -1391,6 +1391,8 @@ class Main
       FileSystem.deleteFile('project.android.xml');
     }
     
+    var pkg = lime.meta.pkg;
+    
     var key = readKey();
     if ( key != null )
     {
@@ -1403,6 +1405,7 @@ class Main
         if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'android') )
         {
           xml = xml.replace('${lime.meta.pkg}', node.att.resolve('package'));
+          pkg = node.att.resolve('package');
         }
       }
       
@@ -1456,8 +1459,20 @@ class Main
     
     addRelease( bytes, '${lime.app.file}-${git}.apk' );
     
-    // Random script
+    // Test script
+    var script = File.getContent('${getPath()}/utils/android.sh');
+    script = script.replace('::APK::', '${lime.app.file}-${git}.apk');
+    script = script.replace('::PACKAGE::', '${pkg}');
+    File.saveContent('Release/android.sh', script);
+    call('chmod +x Release/android.sh');
     
+    // Deploy android script
+    script = File.getContent('${getPath()}/utils/deploy_android.sh');
+    script = script.replace('::APK::', '${lime.app.file}-${git}.apk');
+    script = script.replace('::PACKAGE::', '${pkg}');
+    script = script.replace('::JSON::', '${getPath()}/../google.json');
+    File.saveContent('Release/deploy_android.sh', script);
+    call('chmod +x Release/deploy_android.sh');
     
     // Send to server
     
