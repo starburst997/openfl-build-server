@@ -948,8 +948,8 @@ class Main
   }
   static function installerHTML5Windows( project:Project, info:ProjectInfo, lime:HXProject )
   {
-    //installerCRX( project, info, lime );
-    installerHTML5APPX( project, info, lime );
+    installerCRX( project, info, lime );
+    //installerHTML5APPX( project, info, lime );
   }
   static function installerCRX( project:Project, info:ProjectInfo, lime:HXProject )
   {
@@ -1006,14 +1006,23 @@ class Main
     var manifest = File.getContent('${getPath()}/utils/manifest.json');
     
     manifest = manifest.replace('::PUBLISHER::', '${config.publisher}');
-    manifest = manifest.replace('::VERSION::', '${lime.meta.version}.0');
+    manifest = manifest.replace('::VERSION::', '${lime.meta.version}');
     manifest = manifest.replace('::NAME::', '${lime.meta.title}');
     manifest = manifest.replace('::FILE::', '${lime.app.file}');
     
     File.saveContent('Release/html5-crx/manifest.json', manifest);
     
-    // Command
+    // Main.js
+    var main = File.getContent('${getPath()}/utils/main.js');
     
+    main = main.replace('::WIDTH::', '800');
+    main = main.replace('::HEIGHT::', '600');
+    main = main.replace('::FILE::', '${lime.app.file}');
+    
+    File.saveContent('Release/html5-crx/main.js', main);
+    
+    // Command
+    call('crx pack Release/html5-crx -o Release/${lime.app.file}-${git}.crx -p certificates/key.pem --zip-output Release/${lime.app.file}-chrome-${git}.zip');
   }
   static function installerHTML5APPX( project:Project, info:ProjectInfo, lime:HXProject )
   {
