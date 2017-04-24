@@ -1462,14 +1462,14 @@ class Main
     // Test script
     var script = File.getContent('${getPath()}/utils/android.sh');
     script = script.replace('::APK::', '${lime.app.file}-${git}.apk');
-    script = script.replace('::PACKAGE::', '${pkg}');
+    script = script.replace('::PKG::', '${pkg}');
     File.saveContent('Release/android.sh', script);
     call('chmod +x Release/android.sh');
     
     // Deploy android script
     script = File.getContent('${getPath()}/utils/deploy_android.sh');
     script = script.replace('::APK::', '${lime.app.file}-${git}.apk');
-    script = script.replace('::PACKAGE::', '${pkg}');
+    script = script.replace('::PKG::', '${pkg}');
     script = script.replace('::JSON::', '${getPath()}/../google.json');
     File.saveContent('Release/deploy_android.sh', script);
     call('chmod +x Release/deploy_android.sh');
