@@ -1397,6 +1397,15 @@ class Main
       var xml:String = File.getContent('project.xml');
       xml = xml.replace('</project>', '<certificate path="certificates/key.keystore" password="${key.password}" alias="${key.alias}" alias-password="${key.aliasPassword}" /></project>');
       
+      var fast = new Fast( Xml.parse(xml).firstElement() );
+      for ( node in fast.nodes.meta )
+      {
+        if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'android') )
+        {
+          xml = xml.replace('${lime.meta.pkg}', node.att.resolve('package'));
+        }
+      }
+      
       File.saveContent('project.android.xml', xml);
     }
     else
