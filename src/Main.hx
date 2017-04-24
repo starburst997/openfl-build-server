@@ -1737,11 +1737,11 @@ class Main
     
     if ( project.json.legacy )
     {
-      call('cp -R Export/linux64/cpp/bin Release/linux');
+      call('cp -R Export/linux64/cpp/bin Release');
     }
     else
     {
-      call('cp -R Export/linux64/cpp/final/bin Release/linux');
+      call('cp -R Export/linux64/cpp/final/bin Release');
     }
     
     // Create deb
@@ -1756,24 +1756,14 @@ class Main
     createDir('Release/deb/usr/share/icons/hicolor/128x128/apps');
     createDir('Release/deb/usr/share/icons/hicolor/256x256/apps');
     
-    call('cp -R Release/linux Release/deb/opt/${lime.app.file}');
+    createDir('Release/deb/opt');
+    call('cp -R Release/bin Release/deb/opt/${lime.app.file}');
     
     createDir('Release/deb/opt/${lime.app.file}/Icon/16x16');
     createDir('Release/deb/opt/${lime.app.file}/Icon/32x32');
     createDir('Release/deb/opt/${lime.app.file}/Icon/48x48');
     createDir('Release/deb/opt/${lime.app.file}/Icon/128x128');
     createDir('Release/deb/opt/${lime.app.file}/Icon/256x256');
-    
-    // Control file
-    var size = getCall('du -ks Release/deb|cut -f 1');
-    var control = File.getContent('${getPath()}/utils/deb/control');
-    control = control.replace('::PUBLISHER::', '${config.publisher}');
-    control = control.replace('::VERSION::', '${lime.meta.version}');
-    control = control.replace('::NAME::', '${lime.meta.title}');
-    control = control.replace('::FILE::', '${lime.app.file}');
-    control = control.replace('::EMAIL::', 'jeandenis.boivin@gmail.com');
-    control = control.replace('::SIZE::', '${size}');
-    File.saveContent('Release/deb/DEBIAN/control', control);
     
     // Bin
     var bin = File.getContent('${getPath()}/utils/deb/file');
@@ -1801,6 +1791,17 @@ class Main
       call('convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/deb/usr/share/icons/hicolor/${icon.width}x${icon.height}/apps/${icon.name}');
       call('convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/deb/opt/${lime.app.file}/Icon/${icon.width}x${icon.height}/${icon.name}');
     }
+    
+    // Control file
+    var size = getCall('du -ks Release/deb|cut -f 1');
+    var control = File.getContent('${getPath()}/utils/deb/control');
+    control = control.replace('::PUBLISHER::', '${config.publisher}');
+    control = control.replace('::VERSION::', '${lime.meta.version}');
+    control = control.replace('::NAME::', '${lime.meta.title}');
+    control = control.replace('::FILE::', '${lime.app.file}');
+    control = control.replace('::EMAIL::', 'jeandenis.boivin@gmail.com');
+    control = control.replace('::SIZE::', '${size}');
+    File.saveContent('Release/deb/DEBIAN/control', control);
     
     // Build
     call('dpkg-deb --build Release/deb Release/${lime.app.file}_${git}_amd64.deb');
