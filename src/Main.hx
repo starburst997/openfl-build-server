@@ -1810,7 +1810,7 @@ class Main
     File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop', desktop);
     
     Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/deb/opt');
-    call('tar -cvjSf ../../${lime.app.file}_${git}_x64.tar.bz2 .');
+    call('tar -cvjSf ../../${lime.app.file}_${git}_x64.tar.bz2');
     Sys.setCwd('${cwd}/${project.path}/${info.folder}');
   }
   
