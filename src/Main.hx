@@ -1786,7 +1786,7 @@ class Main
     desktop = desktop.replace('::VERSION::', '${lime.meta.version}');
     desktop = desktop.replace('::NAME::', '${lime.meta.title}');
     desktop = desktop.replace('::FILE::', '${lime.app.file}');
-    File.saveContent('Release/deb/usr/applications/${lime.app.file}.desktop', desktop);
+    File.saveContent('Release/deb/usr/share/applications/${lime.app.file}.desktop', desktop);
     
     // Create icons
     var squares:Array<Icon> = [
