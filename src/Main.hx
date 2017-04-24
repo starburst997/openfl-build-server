@@ -1722,11 +1722,8 @@ class Main
     Sys.print(log);
     trace('');
     
-    // Package .tar.gz
-    
-    
     // Create .deb package for linux
-    // du -ks deb|cut -f 1
+    installerLinux( project, info, lime );
     
     // Send to server
     
