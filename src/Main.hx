@@ -1772,7 +1772,7 @@ class Main
     call('chmod +x Release/deb/usr/bin/${lime.app.file}');
     
     var run = File.getContent('${getPath()}/utils/deb/run.sh');
-    run = bin.replace('::FILE::', '${lime.app.file}');
+    run = run.replace('::FILE::', '${lime.app.file}');
     File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.sh', run);
     call('chmod +x Release/deb/opt/${lime.app.file}/${lime.app.file}.sh');
     
