@@ -14,12 +14,12 @@ chrome.app.runtime.onLaunched.addListener(function() {
   chrome.app.window.create('index.html', {
     id: "::FILE::",
     resizable: true,
-    //innerBounds: { width: width, height: height }
-    outerBounds: {
+    innerBounds: { width: width, height: height }
+    /*outerBounds: {
       width: width,
       height: height,
       left: Math.round((screenWidth-width)/2),
       top: Math.round((screenHeight-height)/2)
-    }
+    }*/
   });
 });
