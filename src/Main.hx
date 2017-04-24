@@ -1535,7 +1535,7 @@ class Main
     
     // Deploy mac script
     var script = File.getContent('${getPath()}/utils/deploy_mac.sh');
-    script = script.replace('::FILE::', '${lime.app.file}-store-${git}.pkg');
+    script = script.replace('::FILE::', 'osx/${lime.app.file}-store-${git}.pkg');
     File.saveContent('Release/deploy_mac.sh', script);
     call('chmod +x Release/deploy_mac.sh');
     
@@ -1560,13 +1560,15 @@ class Main
       File.saveContent('Release/app/${lime.app.file}.app/Contents/Info.plist', plist);
       File.saveContent('Release/store/${lime.app.file}.app/Contents/Info.plist', plist);
       
+      FileSystem.createDirectory('Release/osx');
+      
       // Sign
       call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "${getPath()}/utils/mac.plist"');
       call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "${getPath()}/utils/mac.plist"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "Developer ID Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
-      call('productbuild --component "Release/store/${lime.app.file}.app/" /Applications --sign "3rd Party Mac Developer Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/store/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-store-${git}.pkg"');
+      call('productbuild --component "Release/store/${lime.app.file}.app/" /Applications --sign "3rd Party Mac Developer Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/store/${lime.app.file}.app/Contents/Info.plist" "Release/osx/${lime.app.file}-store-${git}.pkg"');
       
       // Create DMG
       call('sudo ${getPath()}/utils/create-dmg/create-dmg --volname "${lime.meta.title}" --volicon ${full("Release/app")}/${lime.app.file}.app/Contents/Resources/icon.icns --background ${full("utils/dmg.png")} --window-pos 200 120 --window-size 770 410 --icon-size 100 --icon ${lime.app.file}.app 300 248 --hide-extension ${lime.app.file}.app --app-drop-link 500 243 ${full("Release")}/${lime.app.file}-${git}.dmg ${full("Release/app")}');
@@ -1632,6 +1634,8 @@ class Main
     // Yup, building again with fastlane... (I know, will figure out something better, but currently have an issue with turning the .app into .ipa)
     var bytes:Bytes = null;
     
+    FileSystem.createDirectory('ios');
+    
     if ( project.json.legacy )
     {
       // Add fullscreen required for ios submission (yup another hack, but whatev, I just want this to works...)
@@ -1648,11 +1652,11 @@ class Main
       
       if ( lime.certificate != null )
       {
-        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}-${git}');
+        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release/ios -n ${lime.app.file}-${git}');
       }
       else
       {
-        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release -n ${lime.app.file}-${git}');
+        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release/ios -n ${lime.app.file}-${git}');
       }
     }
     else
@@ -1661,11 +1665,11 @@ class Main
       
       if ( lime.certificate != null )
       {
-        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -g ${lime.certificate.teamID} -o Release -n ${lime.app.file}-${git}');
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -g ${lime.certificate.teamID} -o Release/ios -n ${lime.app.file}-${git}');
       }
       else
       {
-        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -o Release -n ${lime.app.file}-${git}');
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -o Release/ios -n ${lime.app.file}-${git}');
       }
     }
     
@@ -1686,7 +1690,7 @@ class Main
     
     // Deploy ios script
     var script = File.getContent('${getPath()}/utils/deploy_ios.sh');
-    script = script.replace('::FILE::', '${lime.app.file}-${git}.ipa');
+    script = script.replace('::FILE::', 'ios/${lime.app.file}-${git}.ipa');
     File.saveContent('Release/deploy_ios.sh', script);
     call('chmod +x Release/deploy_ios.sh');
     
