@@ -1232,8 +1232,12 @@ class Main
     }
     
     // Create script
-    var year = Date.now().getFullYear();
     var appx = File.getContent('${getPath()}/utils/AppxManifest.xml');
+    
+    var key = readKey();
+    appx = appx.replace('::KEY_IDENTITY::', '${key.identity}');
+    appx = appx.replace('::KEY_PUBLISHER::', '${key.publisher}');
+    appx = appx.replace('::KEY_FAMILY::', '${key.family}');
     
     appx = appx.replace('::PUBLISHER::', '${config.publisher}');
     appx = appx.replace('::VERSION::', '${lime.meta.version}.0');
