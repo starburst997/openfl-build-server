@@ -592,7 +592,7 @@ class Main
           trace('');
           if ( test != 0 )
           {
-            
+            if ( test == 1 ) installerLinux( project, p, limeProject );
           }
           else
           {
@@ -1725,8 +1725,89 @@ class Main
     // Package .tar.gz
     
     
+    // Create .deb package for linux
+    // du -ks deb|cut -f 1
+    
     // Send to server
     
+  }
+  static function installerLinux( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    emptyDir('Release/linux');
+    
+    if ( project.json.legacy )
+    {
+      call('cp -R Export/linux64/cpp/bin Release/linux');
+    }
+    else
+    {
+      call('cp -R Export/linux64/cpp/final/bin Release/linux');
+    }
+    
+    // Create deb
+    emptyDir('Release/deb');
+    createDir('Release/deb/DEBIAN');
+    //createDir('Release/deb/opt/${lime.app.file}');
+    createDir('Release/deb/usr/bin');
+    createDir('Release/deb/usr/share/applications');
+    createDir('Release/deb/usr/share/icons/hicolor/16x16/apps');
+    createDir('Release/deb/usr/share/icons/hicolor/32x32/apps');
+    createDir('Release/deb/usr/share/icons/hicolor/48x48/apps');
+    createDir('Release/deb/usr/share/icons/hicolor/128x128/apps');
+    createDir('Release/deb/usr/share/icons/hicolor/256x256/apps');
+    
+    call('cp -R Release/linux Release/deb/opt/${lime.app.file}');
+    
+    createDir('Release/deb/opt/${lime.app.file}/Icon/16x16');
+    createDir('Release/deb/opt/${lime.app.file}/Icon/32x32');
+    createDir('Release/deb/opt/${lime.app.file}/Icon/48x48');
+    createDir('Release/deb/opt/${lime.app.file}/Icon/128x128');
+    createDir('Release/deb/opt/${lime.app.file}/Icon/256x256');
+    
+    // Control file
+    var size = getCall('du -ks Release/deb|cut -f 1');
+    var control = File.getContent('${getPath()}/utils/deb/control');
+    control = control.replace('::PUBLISHER::', '${config.publisher}');
+    control = control.replace('::VERSION::', '${lime.meta.version}');
+    control = control.replace('::NAME::', '${lime.meta.title}');
+    control = control.replace('::FILE::', '${lime.app.file}');
+    control = control.replace('::EMAIL::', 'jeandenis.boivin@gmail.com');
+    control = control.replace('::SIZE::', '${size}');
+    File.saveContent('Release/deb/DEBIAN/control', control);
+    
+    // Bin
+    var bin = File.getContent('${getPath()}/utils/deb/file');
+    bin = bin.replace('::FILE::', '${lime.app.file}');
+    File.saveContent('Release/deb/usr/bin/${lime.app.file}', bin);
+    call('chmod +x Release/deb/usr/bin/${lime.app.file}');
+    
+    // Desktop
+    var desktop = File.getContent('${getPath()}/utils/deb/file.desktop');
+    desktop = desktop.replace('::VERSION::', '${lime.meta.version}');
+    desktop = desktop.replace('::NAME::', '${lime.meta.title}');
+    desktop = desktop.replace('::FILE::', '${lime.app.file}');
+    File.saveContent('Release/deb/usr/applications/${lime.app.file}.desktop', desktop);
+    
+    // Create icons
+    var squares:Array<Icon> = [
+      {name: '${lime.app.file}.png', width: 16, height: 16},
+      {name: '${lime.app.file}.png', width: 32, height: 32},
+      {name: '${lime.app.file}.png', width: 48, height: 48},
+      {name: '${lime.app.file}.png', width: 128, height: 128},
+      {name: '${lime.app.file}.png', width: 256, height: 256},
+    ];
+    for ( icon in squares )
+    {
+      call('convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/deb/usr/share/icons/hicolor/${icon.width}x${icon.height}/apps/${icon.name}');
+      call('convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/deb/opt/${lime.app.file}/Icon/${icon.width}x${icon.height}/${icon.name}');
+    }
+    
+    // Build
+    call('dpkg-deb --build Release/deb Release/${lime.app.file}_${git}_amd64.deb');
+    
+    // Create portable
+    File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop', desktop);
+    call('tar -cvjSf Release/${lime.app.file}_${git}_x64.tar.bz2 Release/deb/opt');
   }
   
   // Get projects by reading the specified folder in cwd

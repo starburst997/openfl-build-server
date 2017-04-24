@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=::VERSION::
+Type=Application
+Name=::NAME::
+GenericName=::NAME::
+Exec=/opt/::FILE::/::FILE:: %F
+Terminal=false
+Icon=::FILE::
+Categories=Game;
+StartupNotify=true

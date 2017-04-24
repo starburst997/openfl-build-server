@@ -1,0 +1,7 @@
+Package: ::FILE::
+Version: ::VERSION::
+Priority: optional
+Architecture: amd64
+Maintainer: ::PUBLISHER:: <::EMAIL::>
+Installed-Size: ::SIZE::
+Description: ::NAME::
