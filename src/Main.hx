@@ -1705,7 +1705,7 @@ class Main
     // Yup, building again with fastlane... (I know, will figure out something better, but currently have an issue with turning the .app into .ipa)
     var bytes:Bytes = null;
     
-    FileSystem.createDirectory('ios');
+    FileSystem.createDirectory('Release/ios');
     
     if ( project.json.legacy )
     {
