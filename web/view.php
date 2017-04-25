@@ -21,11 +21,11 @@ function showFilesize($name, $decimals = 2) {
     <meta name="author" content="">
 	<meta name="keywords" content="flash,game,games,failsafe,notessimo,terminal,sift,heads,stick,rpg,action,html5,ios,android" />
     <link rel="icon" href="favicon.ico">
-
-    <title>Builds Server</title>
-
+	
+    <title>Notessimo 4</title>
+	
 	<link href="//fonts.googleapis.com/css?family=Muli:300italic,300,400italic,400" rel="stylesheet" type="text/css">
-
+	
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
 
@@ -66,39 +66,39 @@ function showFilesize($name, $decimals = 2) {
 			right: 0;
 		}
 
-
+		
 		.sectionTitle{
-
+			
 			font-size: 50px;
 			text-align:center;
 			margin-bottom:80px;
 			text-transform:uppercase;
 		}
-
+		
 		.newsHeading {
 			font-size: 38px;
 		}
-
+		
 		.gameEntry {
-
+			
 			padding:20px 0px;
 			margin:0px;
-
+			
 		}
-
+		
 		.noPadMar{
 			padding:0;
 			margin:0;
 		}
-
+		
 		.imgBW2{
 			-webkit-filter: grayscale(100%);
 			-moz-filter: grayscale(100%);
 			filter: grayscale(100%);
 			opacity:0.8;
-
+			
 		}
-
+		
 		.imgBW2:hover{
 			-webkit-filter: grayscale(0%);
 			-moz-filter: grayscale(0%);
@@ -106,18 +106,14 @@ function showFilesize($name, $decimals = 2) {
 			-webkit-filter:brightness(100%);
 			opacity:1.0;
 		}
-
-    .versionTitle a {
-      text-decoration: none !important;
-    }
-
+		
 	</style>
   </head>
 <!-- NAVBAR
 ================================================== -->
   <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
     <!-- Navigation -->
-
+    
 	<nav class="navbar navbar-custom navbar-fixed-top top-nav-collapse" role="navigation">
         <div class="container">
             <div class="navbar-header">
@@ -152,99 +148,126 @@ function showFilesize($name, $decimals = 2) {
 	<!-- Game Container START -->
 	<div id="pageBody" class="container marketing">
 		<div class="row featurette" style="margin-bottom:80px; margin-top:80px; text-align:center;">
-
+			
 			<div class="versionHeaderContainer">
-				<h1>Builds Server</h1>
+				<h1>Notessimo 4</h1>
 			</div>
 			<br/>
 			 <div class="versionEntries">
-
-
-
-
-
-
-
-
+				 
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
-						<p class="versionTitle"><a href="/"><img src="images/icon.png" height="60"/> PinTown</a></p>
+						<p class="versionTitle"><img src="images/platform_flash.jpg" height="60"> Flash <span class="versionSubtitle" title="<?php echo showTime("flash/Notessimo4.swf"); ?>">(<?php echo showFilesize('flash/Notessimo4.swf'); ?>B)<br/><i>Same file, support both mode</i></span></p>
 					 </div>
-           <div class="col-md-6 col-sm-6 noPadMar versionBtns">
-            <b>1bf5e22</b> (<i>12/04/2017, 12h34</i>)
-           </div>
+					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
+						(Stage3D)
+						<div>
+						<a class="btn btn-lg btn-primary" href="./flash/direct.html" target="_blank" role="button">800x600</a> 
+						<a class="btn btn-lg btn-primary" href="./flash/100.html" target="_blank" role="button">100%</a><br/><br/>
+						</div>
+						(Normal)
+						<div>
+						<a class="btn btn-lg btn-primary" href="./flash/" target="_blank" role="button">800x600</a>
+						<a class="btn btn-lg btn-primary" href="./flash/100_normal.html" target="_blank" role="button">100%</a>
+						</div> 
+					</div>
 				 </div>
-
 				 <HR>
-
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
-						<p class="versionTitle"><a href="/"><img src="images/icon.png" height="60"/> NotessimoViewer</a></p>
+						<p class="versionTitle"><img src="images/platform_html5.jpg" height="60"> HTML 5 <span class="versionSubtitle" title="<?php echo showTime("html5/Notessimo4.js"); ?>">(<?php echo showFilesize('html5/Notessimo4.zip'); ?>B)</span></p>
 					 </div>
-           <div class="col-md-6 col-sm-6 noPadMar versionBtns">
-            <b>1bf5e22</b> (<i>12/04/2017, 12h34</i>)
-           </div>
+					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
+						<a class="btn btn-lg btn-primary" href="./html5/index.html" target="_blank" role="button">800x600</a> 
+						<!--<a class="btn btn-lg btn-primary" href="https://www.notessimo.net/pintown_aXmdnNhG/html5/100.html" target="_blank" role="button">HTTPS</a>!--> 
+						<a class="btn btn-lg btn-primary" href="./html5/100.html" target="_blank" role="button">100%</a>
+					 </div>
 				 </div>
-
 				 <HR>
-
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
-						<p class="versionTitle"><a href="/"><img src="images/icon.png" height="60"/> Notessimo</a></p>
+						<p class="versionTitle"><img src="images/platform_android.jpg" height="60"> Android</p>
 					 </div>
-           <div class="col-md-6 col-sm-6 noPadMar versionBtns">
-            <b>1bf5e22</b> (<i>12/04/2017, 12h34</i>)
-           </div>
+					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
+						<a class="btn btn-lg btn-primary" href="/release_temp/Notessimo4/Notessimo4.apk" role="button" title="<?php echo showTime("../../release_temp/Notessimo4/Notessimo4.apk"); ?>">Download (<?php echo showFilesize('../../release_temp/Notessimo4/Notessimo4.apk'); ?>B)</a>
+					 </div>
 				 </div>
-
-
-
-
-
-
-
-
-
-
-
+				 <HR>
+				 <div class="versionEntry verticalAlign">
+					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
+						<p class="versionTitle"><img src="images/platform_ios.jpg" height="60"> iOS <span class="versionSubtitle"><br/><i>Ask us for signed IPA</i></span></p>
+					 </div>
+					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
+						<a class="btn btn-lg btn-primary" href="/release_temp/Notessimo4/Notessimo4.ipa" role="button" title="<?php echo showTime("../../release_temp/Notessimo4/Notessimo4.ipa"); ?>">Download (<?php echo showFilesize('../../release_temp/Notessimo4/Notessimo4.ipa'); ?>B)</a>
+					 </div>
+				 </div>
+				 <HR>
+				 <div class="versionEntry verticalAlign">
+					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
+						<p class="versionTitle"><img src="images/platform_win.jpg" height="60"> Windows</p>
+					 </div>
+					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
+						<a class="btn btn-lg btn-primary" href="./Notessimo4.zip" role="button" title="<?php echo showTime("Notessimo4.zip"); ?>">Download (<?php echo showFilesize('Notessimo4.zip'); ?>B)</a>
+					 </div>
+				 </div>
+				 <HR>
+				 <div class="versionEntry verticalAlign">
+					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
+						<p class="versionTitle"><img src="images/platform_mac.jpg" height="60"> Mac OS</p>
+					 </div>
+					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
+						<a class="btn btn-lg btn-primary" href="./Notessimo4.dmg" role="button" title="<?php echo showTime("Notessimo4.dmg"); ?>">Download (<?php echo showFilesize('Notessimo4.dmg'); ?>B)</a>
+					 </div>
+				 </div>
+				 <HR>
+				 <div class="versionEntry verticalAlign">
+					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
+						<p class="versionTitle"><img src="images/platform_linux.jpg" height="60"> Linux</p>
+					 </div>
+					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
+						<a class="btn btn-lg btn-primary" href="./Notessimo4.tar.gz" role="button" title="<?php echo showTime("Notessimo4.tar.gz"); ?>">Download (<?php echo showFilesize('Notessimo4.tar.gz'); ?>B)</a>
+					 </div>
+				 </div>
+				 
+				 
 			 </div>
-
+			 
 		</div>
 
 
 		<center style="font-size: 1.4em"><a class="btn btn-lg btn-primary" href="mailto:info@failsafegames.com">info@failsafegames.com</a></center>
 		<br/><br/><br/>
 	</div>
-
-
+	
+	
 	<!-- FOOTER -->
 	<footer class="footer2 container-fluid" style="background-color:#000; color:#FFF; padding:40px;">
 		<p class="pull-right"><a class="aRed" href="#">Back to top</a></p>
-		<p>&copy; 2014 - 2017 FailSafe Games</p>
+		<p>&copy; 2014 FailSafe Games</p>
 	</footer>
 	</div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
+	
     <!--<script src="js/bootstrap.min.js"></script>-->
     <script src="js/bootstrap.js"></script>
     <script src="js/docs.min.js"></script>
-
+	
 	<!-- Contact Form -->
 	<script src="js/jqBootstrapValidation.js"></script>
 	<script src="js/contact_me.js"></script>
-
+	
 	<!-- Plugin JavaScript -->
     <script src="js/jquery.easing.min.js"></script>
-
+	
     <!-- Custom Theme JavaScript -->
 	<script src="js/mobileswipe.js"></script>
-
+	
 	<script type="text/javascript">
 		$(function() {
-
+		
 			$('ul.navbar-nav a').bind('click',function(event){
 			var $anchor = $(this);
 			$('html, body').stop().animate({
@@ -252,9 +275,9 @@ function showFilesize($name, $decimals = 2) {
 				}, 1500,'easeInOutExpo');
 				event.preventDefault();
 			});
-
+			
 		});
 	</script>
-
+	
   </body>
 </html>
