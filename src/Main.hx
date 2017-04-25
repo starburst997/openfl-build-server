@@ -1687,8 +1687,8 @@ class Main
       log = call('haxelib run openfl build project.ios.xml ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
       
       // Cleanup
-      //removeDir('templates_ignore');
-      //FileSystem.deleteFile('project.ios.xml');
+      removeDir('templates_ignore');
+      FileSystem.deleteFile('project.ios.xml');
     }
     else
     {
@@ -1707,18 +1707,25 @@ class Main
     
     FileSystem.createDirectory('Release/ios');
     
+    // Add fullscreen required for ios submission (yup another hack, but whatev, I just want this to works...)
+    /*
     if ( project.json.legacy )
     {
-      // Add fullscreen required for ios submission (yup another hack, but whatev, I just want this to works...)
-      /*if ( FileSystem.exists('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist') )
+      if ( FileSystem.exists('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist') )
       {
         var plist = File.getContent('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist');
         FileSystem.deleteFile('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist');
         
         plist = plist.replace('</dict>', '<key>UIRequiresFullScreen</key><true/></dict>');
         File.saveContent('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist', plist);
-      }*/
-      
+      }
+    }
+    */
+    
+    //call('fastlane sigh -a ${lime.meta.pkg} -u failsafegames@gmail.com');
+    
+    if ( project.json.legacy )
+    {
       call('fastlane run recreate_schemes project:Export/ios/${lime.app.file}.xcodeproj');
       
       if ( lime.certificate != null )
