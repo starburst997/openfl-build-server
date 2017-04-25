@@ -133,6 +133,8 @@ class Main
   static var config:Config = null;
   static var oldTrace = haxe.Log.trace;
   
+  static var action:String = 'build';
+  
   static var fix = false; // Hack
   static var test = 0; // Run tests for debugging
   
@@ -187,6 +189,15 @@ class Main
           fix = args[2] == 'fix';
         }
       }
+      else if ( args[0] == 'compile' )
+      {
+        action = 'compile';
+        if ( args.length > 1 ) rel = args[1];
+        if ( args.length > 2 ) 
+        {
+          fix = args[2] == 'fix';
+        }
+      }
       else if ( args[0] == 'test' )
       {
         action = 'build';
@@ -194,6 +205,8 @@ class Main
         if ( (args.length > 1) && (Std.parseInt(args[1]) > 0) ) test = Std.parseInt(args[1]);
       }
     }
+    
+    Main.action = action;
     
     // Check CWD
     if ( args.length > 0 )
@@ -213,9 +226,33 @@ class Main
     
     separ();
     
-    if ( action == 'switch' )
+    if ( config == null )
     {
-      var project = getProject(cwd);
+      config = 
+      {
+        company: 'FailSafe Games',
+        website: 'https://www.failsafegames.com/',
+        publisher: 'Jean-Denis Boivin'
+      };
+    }
+    
+    if ( action == 'compile' )
+    {
+      var project = getProject('.');
+      if ( project != null )
+      {
+        compileProject( project );
+        
+        trace('Project compiled!');
+      }
+      else
+      {
+        trace('Cannot compile!');
+      }
+    }
+    else if ( action == 'switch' )
+    {
+      var project = getProject('.');
       if ( project != null )
       {
         switchProject( project );
@@ -481,7 +518,7 @@ class Main
     var head = getCall('git', ['rev-parse', 'HEAD']);
     var current = '';
     
-    if ( test == 0 )
+    if ( (test == 0) && (action == 'build') )
     {
       // Update GIT repo
       trace('Updating GIT repo...');
@@ -853,6 +890,7 @@ class Main
     if ( project.json.legacy )
     {
       removeDir('Export/html5/bin');
+      call('rm -Rf Export/html5');
       
       log = call('haxelib run openfl build html5 -verbose -Dwebgl -minify -yui > Release/html5.log');
     }
@@ -1235,9 +1273,18 @@ class Main
     var appx = File.getContent('${getPath()}/utils/AppxManifest.xml');
     
     var key = readKey();
-    appx = appx.replace('::KEY_IDENTITY::', '${key.identity}');
-    appx = appx.replace('::KEY_PUBLISHER::', '${key.publisher}');
-    appx = appx.replace('::KEY_FAMILY::', '${key.family}');
+    if ( key != null )
+    {
+      appx = appx.replace('::KEY_IDENTITY::', '${key.identity}');
+      appx = appx.replace('::KEY_PUBLISHER::', '${key.publisher}');
+      appx = appx.replace('::KEY_FAMILY::', '${key.family}');
+    }
+    else
+    {
+      appx = appx.replace('::KEY_IDENTITY::', 'TEST');
+      appx = appx.replace('::KEY_PUBLISHER::', 'CN=TEST');
+      appx = appx.replace('::KEY_FAMILY::', 'TEST');
+    }
     
     appx = appx.replace('::PUBLISHER::', '${config.publisher}');
     appx = appx.replace('::VERSION::', '${lime.meta.version}.0');
@@ -1640,8 +1687,8 @@ class Main
       log = call('haxelib run openfl build project.ios.xml ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
       
       // Cleanup
-      removeDir('templates_ignore');
-      FileSystem.deleteFile('project.ios.xml');
+      //removeDir('templates_ignore');
+      //FileSystem.deleteFile('project.ios.xml');
     }
     else
     {
