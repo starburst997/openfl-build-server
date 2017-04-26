@@ -378,6 +378,9 @@ class Main
       h.setParameter('git', git);
       h.setParameter('platform', platform);
       
+      error = error.replace('\n', '<br>');
+      error = error.replace('\r', '<br>');
+      
       h.setParameter('error', '${error}');
       
       h.onStatus = function( status )
@@ -424,7 +427,12 @@ class Main
       }
       else
       {
-        var bytes = File.getBytes(file);
+        var content = File.getContent(file);
+        content = content.replace('\n', '<br>');
+        content = content.replace('\r', '<br>');
+        
+        var bytes = Bytes.ofString(content);
+        
         var p = new Path(file);
         h.fileTransfer('log', '${p.file}.${p.ext}', new BytesInput(bytes), bytes.length );
       }

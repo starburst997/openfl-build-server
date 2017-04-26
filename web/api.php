@@ -79,11 +79,16 @@
     if ( $id && $git && $platform && $error )
     {
       // oops we got an error!
+      //$error = str_replace("<br>", "\n", $error);
+      //$error = str_replace("<br>", "\r", $error);
+
       $to      = $email;
       $subject = "* Error: $id ($git) for $platform";
-      $message = "There was an error while compiling $id ($git) for $platform\n\n";
+      $message = "There was an error while compiling $id ($git) for $platform<br><br>";
       $message .= $error;
-      $headers = "From: $from" . "\r\n" .
+      $headers = 'MIME-Version: 1.0' . "\r\n" .
+                 'Content-type: text/html; charset=iso-8859-1' . "\r\n" .
+                 "From: $from" . "\r\n" .
                  "Reply-To: $from" . "\r\n" .
                  "X-Mailer: PHP/" . phpversion();
       mail($to, $subject, $message, $headers);
@@ -106,12 +111,17 @@
       // Usually the log is the last thing, so we can send the email now
       $logContent = file_get_contents("./builds/$id/$git/logs/$platform.log");
 
+      //$logContent = str_replace("<br>", "\n", $logContent);
+      //$logContent = str_replace("<br>", "\r", $logContent);
+
       $to      = $email;
       $subject = "$id ($git) for $platform successful";
-      $message = "$id ($git) for $platform has completed successfully!\n\n";
-      $message .= "$url/view.php?id=$id&git=$git&password=$password\n\n";
+      $message = "$id ($git) for $platform has completed successfully!<br><br>";
+      $message .= "$url/view.php?id=$id&git=$git&password=$password<br><br>";
       $message .= $logContent;
-      $headers = "From: $from" . "\r\n" .
+      $headers = 'MIME-Version: 1.0' . "\r\n" .
+                 'Content-type: text/html; charset=iso-8859-1' . "\r\n" .
+                 "From: $from" . "\r\n" .
                  "Reply-To: $from" . "\r\n" .
                  "X-Mailer: PHP/" . phpversion();
       mail($to, $subject, $message, $headers);
