@@ -317,26 +317,29 @@ class Main
     Sys.sleep(1);
     
     trace('Sending to server (${platform}): ${file}');
-    /*var worker = Thread.create( function()
-    {*/
-      var password = config.password;
-      var url = config.url;
+    var worker = Thread.create( function()
+    {
+      var params = Thread.readMessage(true).split('::|::');
+      
+      var password = params[0];// config.password;
+      var url = params[1];// config.url;
       var h = new Http(url);
       
       h.setParameter('password', password);
       
-      h.setParameter('id', id);
-      h.setParameter('git', git);
-      h.setParameter('platform', platform);
+      h.setParameter('id', params[2]);// id);
+      h.setParameter('git', params[3]);// git);
+      h.setParameter('platform', params[4]);// platform);
       
-      if ( !FileSystem.exists(file) )
+      var f = params[5]; // file;
+      if ( !FileSystem.exists(f) )
       {
-        h.setParameter('error', 'File: ${file} not found!');
+        h.setParameter('error', 'File: ${f} not found!');
       }
       else
       {
-        var bytes = File.getBytes(file);
-        var p = new Path(file);
+        var bytes = File.getBytes(f);
+        var p = new Path(f);
         h.fileTransfer('file', '${p.file}.${p.ext}', new BytesInput(bytes), bytes.length );
       }
       
@@ -356,7 +359,9 @@ class Main
       };
       
       h.request( true );
-    //} );
+    } );
+    
+    worker.sendMessage('${config.password}::|::${config.url}::|::${id}::|::${git}::|::${platform}::|::${file}');
   }
   
   // Send to server async
@@ -366,22 +371,25 @@ class Main
     Sys.sleep(1);
     
     trace('Sending to server (${platform}): ${id}');
-    /*var worker = Thread.create( function()
-    {*/
-      var password = config.password;
-      var url = config.url;
+    var worker = Thread.create( function()
+    {
+      var params = Thread.readMessage(true).split('::|::');
+      
+      var password = params[0];// config.password;
+      var url = params[1];// config.url;
       var h = new Http(url);
       
       h.setParameter('password', password);
       
-      h.setParameter('id', id);
-      h.setParameter('git', git);
-      h.setParameter('platform', platform);
+      h.setParameter('id', params[2]);// id);
+      h.setParameter('git', params[3]);//git);
+      h.setParameter('platform', params[4]);//platform);
       
-      error = error.replace('\n', '<br>');
+      var e = params[5]; // error;
+      e = e.replace('\n', '<br>');
       //error = error.replace('\r', '<br>');
       
-      h.setParameter('error', '${error}');
+      h.setParameter('error', '${e}');
       
       h.onStatus = function( status )
       {
@@ -399,7 +407,9 @@ class Main
       };
       
       h.request( true );
-    //} );
+    } );
+    
+    worker.sendMessage('${config.password}::|::${config.url}::|::${id}::|::${git}::|::${platform}::|::${error}');
   }
   
   // Send to server async
@@ -409,31 +419,34 @@ class Main
     Sys.sleep(1);
     
     trace('Sending to server (${platform}): ${file}');
-    /*var worker = Thread.create( function()
-    {*/
-      var password = config.password;
-      var url = config.url;
+    var worker = Thread.create( function()
+    {
+      var params = Thread.readMessage(true).split('::|::');
+      
+      var password = params[0];// config.password;
+      var url = params[1];// config.url;
       var h = new Http(url);
       
       h.setParameter('password', password);
       
-      h.setParameter('id', id);
-      h.setParameter('git', git);
-      h.setParameter('platform', platform);
+      h.setParameter('id', params[2]);// id);
+      h.setParameter('git', params[3]);// git);
+      h.setParameter('platform', params[4]);// platform);
       
-      if ( !FileSystem.exists(file) )
+      var f = params[5];// f;
+      if ( !FileSystem.exists(f) )
       {
-        h.setParameter('error', 'Log: ${file} not found!');
+        h.setParameter('error', 'Log: ${f} not found!');
       }
       else
       {
-        var content = File.getContent(file);
+        var content = File.getContent(f);
         content = content.replace('\n', '<br>');
         //content = content.replace('\r', '<br>');
         
         var bytes = Bytes.ofString(content);
         
-        var p = new Path(file);
+        var p = new Path(f);
         h.fileTransfer('log', '${p.file}.${p.ext}', new BytesInput(bytes), bytes.length );
       }
       
@@ -453,7 +466,9 @@ class Main
       };
       
       h.request( true );
-    //} );
+    } );
+    
+    worker.sendMessage('${config.password}::|::${config.url}::|::${id}::|::${git}::|::${platform}::|::${file}');
   }
   
   // Just a distinc separation

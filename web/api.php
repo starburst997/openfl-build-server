@@ -84,8 +84,9 @@
 
       $to      = $email;
       $subject = "* Error: $id ($git) for $platform";
-      $message = "There was an error while compiling $id ($git) for $platform<br><br>";
+      $message = "<html><body><pre style=\"font: monospace\">There was an error while compiling $id ($git) for $platform<br><br>";
       $message .= $error;
+      $message .= "</pre></body></html>";
       $headers = 'MIME-Version: 1.0' . "\r\n" .
                  'Content-type: text/html; charset=iso-8859-1' . "\r\n" .
                  "From: $from" . "\r\n" .
@@ -116,9 +117,10 @@
 
       $to      = $email;
       $subject = "$id ($git) for $platform successful";
-      $message = "$id ($git) for $platform has completed successfully!<br><br>";
+      $message = "<html><body><pre style=\"font: monospace\">$id ($git) for $platform has completed successfully!<br><br>";
       $message .= "$url/view.php?id=$id&git=$git&password=$password<br><br>";
       $message .= $logContent;
+      $message .= "</pre></body></html>";
       $headers = 'MIME-Version: 1.0' . "\r\n" .
                  'Content-type: text/html; charset=iso-8859-1' . "\r\n" .
                  "From: $from" . "\r\n" .
