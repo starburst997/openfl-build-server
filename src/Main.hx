@@ -310,6 +310,9 @@ class Main
   // Send to server async
   static function sendServer( id:String, platform:String, file:String )
   {
+    // Fix?
+    Sys.sleep(1);
+    
     trace('Sending to server (${platform}): ${file}');
     var worker = Thread.create( function()
     {
