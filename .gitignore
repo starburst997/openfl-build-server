@@ -1,4 +1,5 @@
 .DS_Store
 projects/*
+web/builds*
 config.json
 web/config.php

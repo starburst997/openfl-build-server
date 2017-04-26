@@ -912,6 +912,14 @@ class Main
     // Package ZIP
     if ( project.json.legacy )
     {
+      // Copy Icon as Favicon
+      var index:String = File.getContent('Export/html5/bin/index.html');
+      index = index.replace('</title>', '<title/>\n<link rel="shortcut icon" type="image/png" href="./favicon.png">');
+      FileSystem.deleteFile('Export/html5/bin/index.html');
+      File.saveContent('Export/html5/bin/index.html', index);
+      
+      call('magick convert utils/icon.png -resize 192x192 -crop 192x192+0+0 -strip +repage Export/html5/bin/favicon.png');
+      
       copyFolder('Export/html5/bin', 'Release/html5');
     }
     else

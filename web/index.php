@@ -9,6 +9,7 @@ function showFilesize($name, $decimals = 2) {
   $factor = floor((strlen($bytes) - 1) / 3);
   return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . " " . @$sz[$factor];
 }
+
 ?>
 
 <!DOCTYPE html>
