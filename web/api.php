@@ -13,6 +13,11 @@
     $platform = get('platform');
     $error = get('error');
 
+    if ( !file_exists("./builds") )
+    {
+      mkdir("./builds");
+    }
+
     // Create dir + check gits
     if ( $id && $git && $platform )
     {
@@ -119,6 +124,11 @@
 
       // Save file
       $f = "./builds/$id/$git/$platform/".$_FILES['file']['name'];
+      if ( $platform == "windows-cert" )
+      {
+        $f = "./builds/$id/$git/$platform/$id-$git.cer";
+      }
+
       move_uploaded_file($_FILES['file']['tmp_name'], $f);
 
       // Special case for some platform

@@ -1494,6 +1494,7 @@ class Main
     Sys.command('signtool.exe sign -f certificates/my.pfx -fd SHA256 -v Release/${lime.app.file}-${git}.appx');
     
     // Send to server
+    sendServer('${lime.app.file}', 'windows-cert', 'certificates/my.cer');
     sendServer('${lime.app.file}', 'windows-appx', 'Release/${lime.app.file}-${git}.appx');
   }
   static function unixPath( path:String )
