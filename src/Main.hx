@@ -1,8 +1,10 @@
 package;
 
+import haxe.Http;
 import haxe.Json;
 import haxe.Timer;
 import haxe.io.Bytes;
+import haxe.io.BytesInput;
 import haxe.io.Path;
 import haxe.xml.Fast;
 import neko.vm.Lock;
@@ -37,9 +39,11 @@ typedef Project =
 // Config JSON, mainly just default values
 typedef Config =
 {
+  var password:String;
   var company:String;
   var website:String;
   var publisher:String;
+  var url:String;
 }
 
 // Lime Project XML, very basic processing
@@ -230,6 +234,8 @@ class Main
     {
       config = 
       {
+        url: 'http://localhost/builds/api.php',
+        password: '123456',
         company: 'FailSafe Games',
         website: 'https://www.failsafegames.com/',
         publisher: 'Jean-Denis Boivin'
@@ -300,6 +306,135 @@ class Main
     
     Sys.exit(0);
 	}
+  
+  // Send to server async
+  static function sendServer( id:String, platform:String, file:String )
+  {
+    trace('Sending to server (${platform}): ${file}');
+    var worker = Thread.create( function()
+    {
+      var password = config.password;
+      var url = config.url;
+      var h = new Http(url);
+      
+      h.setParameter('password', password);
+      
+      h.setParameter('id', id);
+      h.setParameter('git', git);
+      h.setParameter('platform', platform);
+      
+      if ( !FileSystem.exists(file) )
+      {
+        h.setParameter('error', 'File: ${file} not found!');
+      }
+      else
+      {
+        var bytes = File.getBytes(file);
+        var p = new Path(file);
+        h.fileTransfer('file', '${p.file}.${p.ext}', new BytesInput(bytes), bytes.length );
+      }
+      
+      h.onStatus = function( status )
+      {
+        trace('http status: ${status}');
+      };
+      
+      h.onData = function( data )
+      {
+        trace('http data: ${data}');
+      };
+      
+      h.onError = function( error )
+      {
+        trace('http error: ${error}');
+      };
+      
+      h.request( true );
+    } );
+  }
+  
+  // Send to server async
+  static function sendError( id:String, platform:String, error:String )
+  {
+    trace('Sending to server (${platform}): ${id}');
+    var worker = Thread.create( function()
+    {
+      var password = config.password;
+      var url = config.url;
+      var h = new Http(url);
+      
+      h.setParameter('password', password);
+      
+      h.setParameter('id', id);
+      h.setParameter('git', git);
+      h.setParameter('platform', platform);
+      
+      h.setParameter('error', '${error}');
+      
+      h.onStatus = function( status )
+      {
+        trace('http status: ${status}');
+      };
+      
+      h.onData = function( data )
+      {
+        trace('http data: ${data}');
+      };
+      
+      h.onError = function( error )
+      {
+        trace('http error: ${error}');
+      };
+      
+      h.request( true );
+    } );
+  }
+  
+  // Send to server async
+  static function sendLogServer( id:String, platform:String, file:String )
+  {
+    trace('Sending to server (${platform}): ${file}');
+    var worker = Thread.create( function()
+    {
+      var password = config.password;
+      var url = config.url;
+      var h = new Http(url);
+      
+      h.setParameter('password', password);
+      
+      h.setParameter('id', id);
+      h.setParameter('git', git);
+      h.setParameter('platform', platform);
+      
+      if ( !FileSystem.exists(file) )
+      {
+        h.setParameter('error', 'Log: ${file} not found!');
+      }
+      else
+      {
+        var bytes = File.getBytes(file);
+        var p = new Path(file);
+        h.fileTransfer('log', '${p.file}.${p.ext}', new BytesInput(bytes), bytes.length );
+      }
+      
+      h.onStatus = function( status )
+      {
+        trace('http status: ${status}');
+      };
+      
+      h.onData = function( data )
+      {
+        trace('http data: ${data}');
+      };
+      
+      h.onError = function( error )
+      {
+        trace('http error: ${error}');
+      };
+      
+      h.request( true );
+    } );
+  }
   
   // Just a distinc separation
   static function separ()
@@ -933,8 +1068,24 @@ class Main
     var html5 = File.getContent('${getPath()}/utils/html5.sh');
     File.saveContent('Release/html5.sh', html5);
     
-    // Send to server
+    // Chrome version
+    installerCRX( project, info, lime );
     
+    // Send to server
+    if ( FileSystem.exists('Release/html5/${lime.app.file}.js') )
+    {
+      sendServer('${lime.app.file}', 'html5', 'Release/${lime.app.file}-html5-${git}.zip');
+      sendLogServer('${lime.app.file}', 'html5', 'Release/html5.log');
+    }
+    else if ( FileSystem.exists('Release/html5.log') )
+    {
+      var log = File.getContent('Release/html5.log');
+      sendError('${lime.app.file}', 'html5', 'Compile error:\n\n${log}');
+    }
+    else
+    {
+      sendError('${lime.app.file}', 'html5', 'Fatal Error: Not even a log output!');
+    }
   }
   
   // Compile Windows
@@ -983,7 +1134,20 @@ class Main
     installerHTML5Windows( project, info, lime );
     
     // Send to server
-    
+    if ( FileSystem.exists('Release/windows/${lime.app.file}.exe') )
+    {
+      sendServer('${lime.app.file}', 'windows', 'Release/${lime.app.file}-windows-${git}.zip');
+      sendLogServer('${lime.app.file}', 'windows', 'Release/windows.log');
+    }
+    else if ( FileSystem.exists('Release/windows.log') )
+    {
+      var log = File.getContent('Release/windows.log');
+      sendError('${lime.app.file}', 'windows', 'Compile error:\n\n${log}');
+    }
+    else
+    {
+      sendError('${lime.app.file}', 'windows', 'Fatal Error: Not even a log output!');
+    }
   }
   
   // Create windows installer
@@ -994,7 +1158,6 @@ class Main
   }
   static function installerHTML5Windows( project:Project, info:ProjectInfo, lime:HXProject )
   {
-    installerCRX( project, info, lime );
     installerHTML5APPX( project, info, lime );
   }
   static function installerCRX( project:Project, info:ProjectInfo, lime:HXProject )
@@ -1069,6 +1232,10 @@ class Main
     
     // Command
     call('crx pack Release/html5-crx -o Release/${lime.app.file}-${git}.crx -p certificates/key.pem --zip-output Release/${lime.app.file}-chrome-${git}.zip');
+    
+    // Send server
+    sendServer('${lime.app.file}', 'chrome-crx', 'Release/${lime.app.file}-${git}.crx');
+    sendServer('${lime.app.file}', 'chrome', 'Release/${lime.app.file}-chrome-${git}.zip');
   }
   static function installerHTML5APPX( project:Project, info:ProjectInfo, lime:HXProject )
   {
@@ -1209,6 +1376,9 @@ class Main
     if ( FileSystem.exists('Release/${lime.app.file}-html5-${git}.appx') ) FileSystem.deleteFile('Release/${lime.app.file}-html5-${git}.appx');
     Sys.command('MakeAppx.exe pack /l /d Release/html5-appx /p Release/${lime.app.file}-html5-${git}.appx');
     Sys.command('signtool.exe sign -f certificates/my.pfx -fd SHA256 -v Release/${lime.app.file}-html5-${git}.appx');
+    
+    // Send to server
+    sendServer('${lime.app.file}', 'windows-html5-appx', 'Release/${lime.app.file}-html5-${git}.appx');
   }
   static function installerAPPX( project:Project, info:ProjectInfo, lime:HXProject )
   {
@@ -1322,6 +1492,9 @@ class Main
     if ( FileSystem.exists('Release/${lime.app.file}-${git}.appx') ) FileSystem.deleteFile('Release/${lime.app.file}-${git}.appx');
     Sys.command('MakeAppx.exe pack /l /d Release/windows /p Release/${lime.app.file}-${git}.appx');
     Sys.command('signtool.exe sign -f certificates/my.pfx -fd SHA256 -v Release/${lime.app.file}-${git}.appx');
+    
+    // Send to server
+    sendServer('${lime.app.file}', 'windows-appx', 'Release/${lime.app.file}-${git}.appx');
   }
   static function unixPath( path:String )
   {
@@ -1379,6 +1552,9 @@ class Main
     
     // Run script
     call('makensis Release/installer.nsi');
+    
+    // Send to server
+    sendServer('${lime.app.file}', 'windows-setup', 'Release/${lime.app.file}-${git}.exe');
   }
   static function fileDirectoryWindows( path:String, outPath:String = "$INSTDIR" )
   {
@@ -1530,7 +1706,20 @@ class Main
     call('chmod +x Release/deploy_android.sh');
     
     // Send to server
-    
+    if ( FileSystem.exists('Release/${lime.app.file}-${git}.apk') )
+    {
+      sendServer('${lime.app.file}', 'android', 'Release/${lime.app.file}-${git}.apk');
+      sendLogServer('${lime.app.file}', 'android', 'Release/android.log');
+    }
+    else if ( FileSystem.exists('Release/android.log') )
+    {
+      var log = File.getContent('Release/android.log');
+      sendError('${lime.app.file}', 'android', 'Compile error:\n\n${log}');
+    }
+    else
+    {
+      sendError('${lime.app.file}', 'android', 'Fatal Error: Not even a log output!');
+    }
   }
   
   // Compile Mac
@@ -1619,7 +1808,20 @@ class Main
     call('chmod +x Release/deploy_mac.sh');
     
     // Send to server
-    
+    if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
+    {
+      sendServer('${lime.app.file}', 'mac', 'Release/${lime.app.file}-${git}.dmg');
+      sendLogServer('${lime.app.file}', 'mac', 'Release/mac.log');
+    }
+    else if ( FileSystem.exists('Release/mac.log') )
+    {
+      var log = File.getContent('Release/mac.log');
+      sendError('${lime.app.file}', 'mac', 'Compile error:\n\n${log}');
+    }
+    else
+    {
+      sendError('${lime.app.file}', 'mac', 'Fatal Error: Not even a log output!');
+    }
   }
   
   // Create Mac installer
@@ -1654,6 +1856,10 @@ class Main
       
       // Sign DMG
       call('codesign -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/${lime.app.file}-${git}.dmg"');
+      
+      // Send server
+      sendServer('${lime.app.file}', 'mac-setup', 'Release/${lime.app.file}-${git}.pkg');
+      sendServer('${lime.app.file}', 'mac-store', 'Release/osx/${lime.app.file}-store-${git}.pkg');
     }
   }
   
@@ -1781,7 +1987,20 @@ class Main
     call('chmod +x Release/deploy_ios.sh');
     
     // Send to server
-    
+    if ( FileSystem.exists('Export/ios/build/Release-iphoneos/${lime.app.file}.app') || FileSystem.exists('Export/ios/final/build/Release-iphoneos/${lime.app.file}.app') )
+    {
+      sendServer('${lime.app.file}', 'ios', 'Release/ios/${lime.app.file}-${git}.ipa');
+      sendLogServer('${lime.app.file}', 'ios', 'Release/ios.log');
+    }
+    else if ( FileSystem.exists('Release/ios.log') )
+    {
+      var log = File.getContent('Release/ios.log');
+      sendError('${lime.app.file}', 'ios', 'Compile error:\n\n${log}');
+    }
+    else
+    {
+      sendError('${lime.app.file}', 'ios', 'Fatal Error: Not even a log output!');
+    }
   }
   
   // Compile Linux
@@ -1893,6 +2112,7 @@ class Main
     
     // Build
     call('dpkg-deb --build Release/deb Release/${lime.app.file}_${git}_amd64.deb');
+    sendServer('${lime.app.file}', 'ubuntu', 'Release/${lime.app.file}_${git}_amd64.deb');
     
     // Create portable
     File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop', desktop);
@@ -1900,6 +2120,22 @@ class Main
     Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/deb/opt');
     call('tar -cvjSf ../../${lime.app.file}_${git}_x64.tar.bz2 ${lime.app.file}');
     Sys.setCwd('${cwd}/${project.path}/${info.folder}');
+    
+    // Send to server
+    if ( FileSystem.exists('Release/bin/${lime.app.file}') )
+    {
+      sendServer('${lime.app.file}', 'linux', 'Release/${lime.app.file}_${git}_x64.tar.bz2');
+      sendLogServer('${lime.app.file}', 'linux', 'Release/linux.log');
+    }
+    else if ( FileSystem.exists('Release/linux.log') )
+    {
+      var log = File.getContent('Release/linux.log');
+      sendError('${lime.app.file}', 'linux', 'Compile error:\n\n${log}');
+    }
+    else
+    {
+      sendError('${lime.app.file}', 'linux', 'Fatal Error: Not even a log output!');
+    }
   }
   
   // Get projects by reading the specified folder in cwd
@@ -1924,6 +2160,8 @@ class Main
     {
       config = 
       {
+        password: '123456',
+        url: 'http://localhost/builds/api.php',
         company: 'FailSafe Games',
         website: 'https://www.failsafegames.com/',
         publisher: 'Jean-Denis Boivin'

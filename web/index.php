@@ -1,14 +1,18 @@
 <?php
-function showTime($name) {
-  return date ("F d Y H:i:s", filemtime( __DIR__ . "/" . $name ) );
-}
-function showFilesize($name, $decimals = 2) {
-  $bytes = filesize( __DIR__ . "/" . $name );
 
-  $sz = 'BKMGTP';
-  $factor = floor((strlen($bytes) - 1) / 3);
-  return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . " " . @$sz[$factor];
-}
+  include("config.php");
+  include("utils.php");
+
+  function showTime($name) {
+    return date ("F d Y H:i:s", filemtime( __DIR__ . "/" . $name ) );
+  }
+  function showFilesize($name, $decimals = 2) {
+    $bytes = filesize( __DIR__ . "/" . $name );
+
+    $sz = 'BKMGTP';
+    $factor = floor((strlen($bytes) - 1) / 3);
+    return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . " " . @$sz[$factor];
+  }
 
 ?>
 
