@@ -317,6 +317,149 @@ class Main
     Sys.sleep(1);
     
     trace('Sending to server (${platform}): ${file}');
+    
+    var password = config.password;
+    var url = config.url;
+    var h = new Http(url);
+    
+    h.setParameter('password', password);
+    
+    h.setParameter('id', id);
+    h.setParameter('git', git);
+    h.setParameter('platform', platform);
+    
+    var f = file;
+    if ( !FileSystem.exists(f) )
+    {
+      h.setParameter('error', 'File: ${f} not found!');
+    }
+    else
+    {
+      var bytes = File.getBytes(f);
+      var p = new Path(f);
+      h.fileTransfer('file', '${p.file}.${p.ext}', new BytesInput(bytes), bytes.length );
+    }
+    
+    h.onStatus = function( status )
+    {
+      trace('http status: ${status}');
+    };
+    
+    h.onData = function( data )
+    {
+      trace('http data: ${data}');
+    };
+    
+    h.onError = function( error )
+    {
+      trace('http error: ${error}');
+    };
+    
+    h.request( true );
+  }
+  
+  // Send to server async
+  static function sendError( id:String, platform:String, error:String )
+  {
+    // Fix?
+    Sys.sleep(1);
+    
+    trace('Sending to server (${platform}): ${id}');
+    
+    var password = config.password;
+    var url = config.url;
+    var h = new Http(url);
+    
+    h.setParameter('password', password);
+    
+    h.setParameter('id', id);
+    h.setParameter('git', git);
+    h.setParameter('platform', platform);
+    
+    var e = error;
+    e = e.replace('\n', '<br>');
+    //error = error.replace('\r', '<br>');
+    
+    h.setParameter('error', '${e}');
+    
+    h.onStatus = function( status )
+    {
+      trace('http status: ${status}');
+    };
+    
+    h.onData = function( data )
+    {
+      trace('http data: ${data}');
+    };
+    
+    h.onError = function( error )
+    {
+      trace('http error: ${error}');
+    };
+    
+    h.request( true );
+  }
+  
+  // Send to server async
+  static function sendLogServer( id:String, platform:String, file:String )
+  {
+    // Fix?
+    Sys.sleep(1);
+    
+    trace('Sending to server (${platform}): ${file}');
+    
+    var password = config.password;
+    var url = config.url;
+    var h = new Http(url);
+    
+    h.setParameter('password', password);
+    
+    h.setParameter('id', id);
+    h.setParameter('git', git);
+    h.setParameter('platform', platform);
+    
+    var f = file;
+    if ( !FileSystem.exists(f) )
+    {
+      h.setParameter('error', 'Log: ${f} not found!');
+    }
+    else
+    {
+      var content = File.getContent(f);
+      content = content.replace('\n', '<br>');
+      //content = content.replace('\r', '<br>');
+      
+      var bytes = Bytes.ofString(content);
+      
+      var p = new Path(f);
+      h.fileTransfer('log', '${p.file}.${p.ext}', new BytesInput(bytes), bytes.length );
+    }
+    
+    h.onStatus = function( status )
+    {
+      trace('http status: ${status}');
+    };
+    
+    h.onData = function( data )
+    {
+      trace('http data: ${data}');
+    };
+    
+    h.onError = function( error )
+    {
+      trace('http error: ${error}');
+    };
+    
+    h.request( true );
+  }
+  
+  // Send to server async
+  /*static function sendServer( id:String, platform:String, file:String )
+  {
+    // Fix?
+    Sys.sleep(1);
+    
+    trace('Sending to server (${platform}): ${file}');
     var worker = Thread.create( function()
     {
       var params = Thread.readMessage(true).split('::|::');
@@ -469,7 +612,7 @@ class Main
     } );
     
     worker.sendMessage('${config.password}::|::${config.url}::|::${id}::|::${git}::|::${platform}::|::${file}');
-  }
+  }*/
   
   // Just a distinc separation
   static function separ()
