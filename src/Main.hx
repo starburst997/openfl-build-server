@@ -314,8 +314,8 @@ class Main
     Sys.sleep(1);
     
     trace('Sending to server (${platform}): ${file}');
-    var worker = Thread.create( function()
-    {
+    /*var worker = Thread.create( function()
+    {*/
       var password = config.password;
       var url = config.url;
       var h = new Http(url);
@@ -353,7 +353,7 @@ class Main
       };
       
       h.request( true );
-    } );
+    //} );
   }
   
   // Send to server async
@@ -507,8 +507,8 @@ class Main
       //l.release();
       
       // Wait 30sec...
-      Sys.sleep(1);
-      //Sys.sleep(30);
+      //Sys.sleep(1);
+      Sys.sleep(30);
       
       if ( test != 0 )
       {
