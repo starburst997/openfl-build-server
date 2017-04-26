@@ -359,9 +359,12 @@ class Main
   // Send to server async
   static function sendError( id:String, platform:String, error:String )
   {
+    // Fix?
+    Sys.sleep(1);
+    
     trace('Sending to server (${platform}): ${id}');
-    var worker = Thread.create( function()
-    {
+    /*var worker = Thread.create( function()
+    {*/
       var password = config.password;
       var url = config.url;
       var h = new Http(url);
@@ -390,15 +393,18 @@ class Main
       };
       
       h.request( true );
-    } );
+    //} );
   }
   
   // Send to server async
   static function sendLogServer( id:String, platform:String, file:String )
   {
+    // Fix?
+    Sys.sleep(1);
+    
     trace('Sending to server (${platform}): ${file}');
-    var worker = Thread.create( function()
-    {
+    /*var worker = Thread.create( function()
+    {*/
       var password = config.password;
       var url = config.url;
       var h = new Http(url);
@@ -436,7 +442,7 @@ class Main
       };
       
       h.request( true );
-    } );
+    //} );
   }
   
   // Just a distinc separation
@@ -2116,7 +2122,6 @@ class Main
     
     // Build
     call('dpkg-deb --build Release/deb Release/${lime.app.file}_${git}_amd64.deb');
-    sendServer('${lime.app.file}', 'ubuntu', 'Release/${lime.app.file}_${git}_amd64.deb');
     
     // Create portable
     File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop', desktop);
@@ -2140,6 +2145,8 @@ class Main
     {
       sendError('${lime.app.file}', 'linux', 'Fatal Error: Not even a log output!');
     }
+    
+    sendServer('${lime.app.file}', 'ubuntu', 'Release/${lime.app.file}_${git}_amd64.deb');
   }
   
   // Get projects by reading the specified folder in cwd
