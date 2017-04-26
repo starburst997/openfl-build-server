@@ -21,6 +21,9 @@
       {
         mkdir("./builds/$id");
 
+        // Copy config
+        copy("./config.php", "./builds/$id/config.php");
+
         // Create git text file
         $file = fopen("./builds/$id/git.txt", "w") or die("Unable to open file!");
         fwrite($file, "");
@@ -71,7 +74,14 @@
     if ( $id && $git && $platform && $error )
     {
       // oops we got an error!
-
+      $to      = $email;
+      $subject = "* Error: $id ($git) for $platform";
+      $message = "There was an error while compiling $id ($git) for $platform\n\n";
+      $message .= $error;
+      $headers = "From: $from" . "\r\n" .
+                 "Reply-To: $from" . "\r\n" .
+                 "X-Mailer: PHP/" . phpversion();
+      mail($to, $subject, $message, $headers);
     }
     else if ( $id && $git && $platform && isset($_FILES['log']) )
     {
@@ -82,13 +92,20 @@
       }
       move_uploaded_file($_FILES['log']['tmp_name'], "./builds/$id/$git/logs/$platform.log");
 
-      // Log content
-
+      // Load specific password
+      if ( file_exists("./builds/".get('id')."/config.php") )
+      {
+        include("./builds/".get('id')."/config.php");
+      }
 
       // Usually the log is the last thing, so we can send the email now
+      $logContent = file_get_contents("./builds/$id/$git/logs/$platform.log");
+
       $to      = $email;
-      $subject = "$id ($git) build complete";
-      $message = 'Yo man!';
+      $subject = "$id ($git) for $platform successful";
+      $message = "$id ($git) for $platform has completed successfully!\n\n";
+      $message .= "$url/view.php?id=$id&git=$git&password=$password\n\n";
+      $message .= $logContent;
       $headers = "From: $from" . "\r\n" .
                  "Reply-To: $from" . "\r\n" .
                  "X-Mailer: PHP/" . phpversion();

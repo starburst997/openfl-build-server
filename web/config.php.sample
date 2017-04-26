@@ -1,0 +1,15 @@
+<?php
+
+  $password = "123456";
+  $url = "https://www.something.com/";
+  $email = "baby@potato.com";
+  $from = "myself@gmail.com";
+  $testflight = "";
+  $googlebeta = "";
+  $appstore = "";
+  $googlestore = "";
+  $macstore = "";
+  $microsoftstore = "";
+  $amazonstore = "";
+
+?>
