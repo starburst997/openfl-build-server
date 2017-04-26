@@ -85,6 +85,9 @@ typedef ProjectJSON =
   
   // If this is a legacy OpenFL project
   @optional var legacy:Bool;
+  
+  // Specify if this is in landscape
+  @optional var landscape:Bool;
 }
 
 // Project inside project info
@@ -1058,7 +1061,7 @@ class Main
     {
       // Copy Icon as Favicon
       var index:String = File.getContent('Export/html5/bin/index.html');
-      index = index.replace('</title>', '<title/>\n<link rel="shortcut icon" type="image/png" href="./favicon.png">');
+      index = index.replace('</title>', '</title><link rel="shortcut icon" type="image/png" href="./favicon.png"/>');
       FileSystem.deleteFile('Export/html5/bin/index.html');
       File.saveContent('Export/html5/bin/index.html', index);
       
@@ -1360,6 +1363,12 @@ class Main
     appx = appx.replace('::VERSION::', '${lime.meta.version}.0');
     appx = appx.replace('::NAME::', '${lime.meta.title}');
     appx = appx.replace('::FILE::', '${lime.app.file}');
+    
+    if ( project.json.landscape )
+    {
+      appx = appx.replace('<!--<uap:InitialRotationPreference>', '<uap:InitialRotationPreference>');
+      appx = appx.replace('</uap:InitialRotationPreference>-->', '</uap:InitialRotationPreference>');
+    }
     
     // Save script
     File.saveContent('Release/html5-appx/AppxManifest.xml', appx);
