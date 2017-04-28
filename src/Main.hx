@@ -1209,7 +1209,7 @@ class Main
       removeDir('Export/html5/bin');
       call('rm -Rf Export/html5');
       
-      log = call('haxelib run openfl build html5 -verbose -Dwebgl -minify -yui > Release/html5.log');
+      log = call('haxelib run openfl build html5 -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dwebgl -minify -yui > Release/html5.log');
     }
     else
     {
@@ -1217,7 +1217,7 @@ class Main
       removeDir('Export/html5/final/bin');
       createDir('Export/html5/final/haxe/_generated');
       
-      log = call('haxelib run openfl build html5 -verbose -final > Release/html5.log');
+      log = call('haxelib run openfl build html5 -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/html5.log');
     }
     
     log = getLog('Release/html5.log');
@@ -1282,7 +1282,7 @@ class Main
     {
       removeDir('Export/windows/cpp/bin');
       
-      log = call('haxelib run openfl build windows -verbose -Dlegacy > Release/windows.log');
+      log = call('haxelib run openfl build windows -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy > Release/windows.log');
     }
     else
     {
@@ -1290,7 +1290,7 @@ class Main
       removeDir('Export/windows/cpp/final/bin');
       createDir('Export/windows/cpp/final/haxe/_generated');
       
-      log = call('haxelib run openfl build windows -verbose -final > Release/windows.log');
+      log = call('haxelib run openfl build windows -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/windows.log');
     }
     
     log = getLog('Release/windows.log');
@@ -1844,7 +1844,7 @@ class Main
     {
       removeDir('Export/android/bin');
       
-      log = call('haxelib run openfl build project.android.xml android -verbose -Dlegacy -Drelease > Release/android.log');
+      log = call('haxelib run openfl build project.android.xml android -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy -Drelease > Release/android.log');
     }
     else
     {
@@ -1852,7 +1852,7 @@ class Main
       removeDir('Export/android');
       createDir('Export/android/final/haxe/_generated');
       
-      log = call('haxelib run openfl build project.android.xml android -verbose -final > Release/android.log');
+      log = call('haxelib run openfl build project.android.xml android -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/android.log');
     }
     
     // Cleanup
@@ -1946,12 +1946,12 @@ class Main
     // Build
     if ( project.json.legacy )
     {
-      log = call('haxelib run openfl build project.mac.xml mac -verbose -Dlegacy > Release/mac.log');
+      log = call('haxelib run openfl build project.mac.xml mac -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy > Release/mac.log');
     }
     else
     {
       createDir('Export/mac64/cpp/final/haxe/_generated');
-      log = call('haxelib run openfl build project.mac.xml mac -verbose -final > Release/mac.log');
+      log = call('haxelib run openfl build project.mac.xml mac -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/mac.log');
     }
     
     if ( FileSystem.exists('project.mac.xml') )
@@ -2087,7 +2087,7 @@ class Main
       
       // -Dsource-header=0
       // No idea why this is needed...
-      log = call('haxelib run openfl build project.ios.xml ios -verbose -Dlegacy -Dsource-header=0 > Release/ios.log');
+      log = call('haxelib run openfl build project.ios.xml ios -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy -Dsource-header=0 > Release/ios.log');
       
       // Cleanup
       removeDir('templates_ignore');
@@ -2096,7 +2096,7 @@ class Main
     else
     {
       createDir('Export/ios/final/${lime.app.file}/haxe/_generated');
-      log = call('haxelib run openfl build ios -verbose -final > Release/ios.log');
+      log = call('haxelib run openfl build ios -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/ios.log');
     }
     
     log = getLog('Release/ios.log');
@@ -2202,12 +2202,12 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib run openfl build linux -32 -verbose -Dlegacy > Release/linux32.log');
+      log = call('haxelib run openfl build linux -32 -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy > Release/linux32.log');
     }
     else
     {
       createDir('Export/linux/cpp/final/haxe/_generated');
-      log = call('haxelib run openfl build linux -32 -verbose -final > Release/linux32.log');
+      log = call('haxelib run openfl build linux -32 -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/linux32.log');
     }
     
     log = getLog('Release/linux32.log');
@@ -2335,12 +2335,12 @@ class Main
     
     if ( project.json.legacy )
     {
-      log = call('haxelib run openfl build linux -verbose -Dlegacy > Release/linux.log');
+      log = call('haxelib run openfl build linux -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy > Release/linux.log');
     }
     else
     {
       createDir('Export/linux64/cpp/final/haxe/_generated');
-      log = call('haxelib run openfl build linux -verbose -final > Release/linux.log');
+      log = call('haxelib run openfl build linux -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/linux.log');
     }
     
     log = getLog('Release/linux.log');
