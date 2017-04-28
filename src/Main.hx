@@ -2008,7 +2008,7 @@ class Main
     else
     {
       createDir('Export/mac64/cpp/final/haxe/_generated');
-      log = call('haxelib run openfl build project.mac.xml mac -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/mac.log');
+      log = call('haxelib run openfl build project.mac.xml mac -verbose -Dgit=${git} -Dversion=${lime.meta.version} -DMACOSX_DEPLOYMENT_TARGET=10.6 -final > Release/mac.log');
     }
     
     if ( FileSystem.exists('project.mac.xml') )
