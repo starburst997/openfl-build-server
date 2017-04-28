@@ -3,15 +3,29 @@
   include("config.php");
   include("utils.php");
 
+  include("SensioLabs/AnsiConverter/AnsiToHtmlConverter.php");
+
   $N = 10;
+
+  $adminPassword = $password;
+
+  // Check IP is valid
+  if ( isset($ip) && ($ip != "") )
+  {
+    if ( getenv('REMOTE_ADDR') != $ip )
+    {
+      die('Not authorized');
+    }
+  }
 
   // Simple password check, really dummy...
   if ( get('password') == $password )
   {
     $id = get('id');
     $git = get('git');
+    $version = get('version');
     $platform = get('platform');
-    $error = get('error');
+    $error = get('error', false);
 
     if ( !file_exists("./builds") )
     {
@@ -19,7 +33,7 @@
     }
 
     // Create dir + check gits
-    if ( $id && $git && $platform )
+    if ( $id && $git && $platform && $version )
     {
       // Check if we need to create project
       if ( !file_exists("./builds/$id") )
@@ -27,7 +41,14 @@
         mkdir("./builds/$id");
 
         // Copy config
-        copy("./config.php", "./builds/$id/config.php");
+        //copy("./config.php", "./builds/$id/config.php");
+
+        $config = file_get_contents("./config.php");
+        $config = str_replace($password, generateRandomString(12), $config);
+
+        $file = fopen("./builds/$id/config.php", "w") or die("Unable to open file!");
+        fwrite($file, $config);
+        fclose($file);
 
         // Create git text file
         $file = fopen("./builds/$id/git.txt", "w") or die("Unable to open file!");
@@ -44,19 +65,29 @@
         $gits = loadGit($id);
 
         // Add new git
-        $gits[$git] = time();
-        arsort($gits);
+        $build = array();
+        $build['git'] = $git;
+        $build['version'] = $version;
+        $build['time'] = gmdate("m/d/Y, H:i", time());
+        $build['sort'] = time();
+
+        $gits[] = $build;
+
+        // Sort builds
+        function sortCustom($a, $b) {
+          return $b['sort'] - $a['sort'];
+        }
+
+        usort($gits, 'sortCustom');
 
         // If we are over N delete oldest
         if ( count($gits) > $N )
         {
           while ( count($gits) > $N )
           {
-            $val = end($gits);
-            $key = key($gits);
-            array_pop($gits);
+            $build = array_pop($gits);
 
-            deleteDir("./builds/$id/$key");
+            deleteDir("./builds/$id/".$build['git']);
           }
         }
 
@@ -68,7 +99,7 @@
           if ( !$first ) {
             fwrite($file, "\n");
           }
-          fwrite($file, "$key:$value");
+          fwrite($file, $value['git'].":".$value['sort'].":".$value['version']);
           $first = false;
         }
         fclose($file);
@@ -82,10 +113,14 @@
       //$error = str_replace("<br>", "\n", $error);
       //$error = str_replace("<br>", "\r", $error);
 
+      use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
+      $converter = new AnsiToHtmlConverter();
+      $html = $converter->convert($error);
+
       $to      = $email;
       $subject = "* Error: $id ($git) for $platform";
-      $message = "<html><body><pre style=\"font: monospace\">There was an error while compiling $id ($git) for $platform<br><br>";
-      $message .= $error;
+      $message = "<html><body>There was an error while compiling $id ($git) for $platform<br><br><br><pre style=\"font: monospace; background-color: #000000; color: #00FF00;\">";
+      $message .= $html;
       $message .= "</pre></body></html>";
       $headers = 'MIME-Version: 1.0' . "\r\n" .
                  'Content-type: text/html; charset=iso-8859-1' . "\r\n" .
@@ -115,11 +150,15 @@
       //$logContent = str_replace("<br>", "\n", $logContent);
       //$logContent = str_replace("<br>", "\r", $logContent);
 
+      use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
+      $converter = new AnsiToHtmlConverter();
+      $html = $converter->convert($logContent);
+
       $to      = $email;
       $subject = "$id ($git) for $platform successful";
-      $message = "<html><body><pre style=\"font: monospace\">$id ($git) for $platform has completed successfully!<br><br>";
-      $message .= "$url/view.php?id=$id&git=$git&password=$password<br><br>";
-      $message .= $logContent;
+      $message = "<html><body>$id ($git) for $platform has completed successfully!<br><br><br>";
+      $message .= "<a href=\"$url/view.php?id=$id&git=$git&password=".urlencode($password)."\">$url/view.php?id=$id&git=$git&password=".urlencode($password)."</a><br><br><br><pre style=\"font: monospace; background-color: #000000; color: #00FF00;\">";
+      $message .= $html;
       $message .= "</pre></body></html>";
       $headers = 'MIME-Version: 1.0' . "\r\n" .
                  'Content-type: text/html; charset=iso-8859-1' . "\r\n" .

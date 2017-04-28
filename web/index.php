@@ -3,16 +3,64 @@
   include("config.php");
   include("utils.php");
 
-  function showTime($name) {
-    return date ("F d Y H:i:s", filemtime( __DIR__ . "/" . $name ) );
+  if ( get('password') != $password )
+  {
+    die('No access!');
   }
-  function showFilesize($name, $decimals = 2) {
-    $bytes = filesize( __DIR__ . "/" . $name );
 
-    $sz = 'BKMGTP';
-    $factor = floor((strlen($bytes) - 1) / 3);
-    return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . " " . @$sz[$factor];
+  $adminPassword = $password;
+
+  // Save cookie
+  $cookie_name = "adminPassword";
+  $cookie_value = $password;
+  setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
+
+  // Read dirs
+  $dirs = scandir('./builds');
+  $builds = array();
+  foreach ( $dirs as $key=>$value )
+  {
+    if ( substr($value, 0, 1) != '.' )
+    {
+      $build = array();
+      $build['name'] = $value;
+
+      if ( file_exists("./builds/$value/icon.png") )
+      {
+        $build['icon'] = "./builds/$value/icon.png";
+      }
+      else
+      {
+        $build['icon'] = "./images/icon.png";
+      }
+
+      if ( file_exists("./builds/$value/config.php") )
+      {
+        include "./builds/$value/config.php";
+
+        $build['password'] = $password;
+      }
+      else
+      {
+        $build['password'] = $adminPassword;
+      }
+
+      $gits = loadGit($value);
+
+      if ( count($gits) > 0 )
+      {
+        $b = $gits[0];
+        $build['sort'] = $b['sort'];
+        $build['time'] = $b['time'];
+        $build['git'] = $b['git'];
+        $build['version'] = $b['version'];
+
+        $builds[] = $build;
+      }
+    }
   }
+
+  usort($builds, 'sortCustom');
 
 ?>
 
@@ -165,51 +213,21 @@
 			 <div class="versionEntries">
 
 
+        <?php $first = true; ?>
+        <?php foreach($builds as $key=>$value): ?>
 
-
-
-
-
-
-				 <div class="versionEntry verticalAlign">
-					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
-						<p class="versionTitle"><a href="/"><img src="images/icon.png" height="60"/> PinTown</a></p>
-					 </div>
-           <div class="col-md-6 col-sm-6 noPadMar versionBtns">
-            <b>1bf5e22</b> (<i>12/04/2017, 12h34</i>)
+          <?php if ( !$first ) { echo '<HR>'; } ?>
+          <div class="versionEntry verticalAlign">
+           <div class="col-md-6 col-sm-6 noPadMar versionDesc">
+            <p class="versionTitle"><a href="<?php echo "./view.php?id=".$value['name']."&git=".$value['git']."&password=".$value['password']; ?>"><img src="<?php echo $value['icon']; ?>" height="60"/> <?php echo $value['name']; ?></a></p>
            </div>
-				 </div>
-
-				 <HR>
-
-				 <div class="versionEntry verticalAlign">
-					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
-						<p class="versionTitle"><a href="/"><img src="images/icon.png" height="60"/> NotessimoViewer</a></p>
-					 </div>
            <div class="col-md-6 col-sm-6 noPadMar versionBtns">
-            <b>1bf5e22</b> (<i>12/04/2017, 12h34</i>)
+            <?php echo $value['version']; ?> - <b><?php echo $value['git']; ?></b> (<i><?php echo $value['time']; ?></i>)
            </div>
-				 </div>
+          </div>
 
-				 <HR>
-
-				 <div class="versionEntry verticalAlign">
-					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
-						<p class="versionTitle"><a href="/"><img src="images/icon.png" height="60"/> Notessimo</a></p>
-					 </div>
-           <div class="col-md-6 col-sm-6 noPadMar versionBtns">
-            <b>1bf5e22</b> (<i>12/04/2017, 12h34</i>)
-           </div>
-				 </div>
-
-
-
-
-
-
-
-
-
+        <?php $first = false; ?>
+        <?php endforeach; ?>
 
 
 			 </div>
@@ -225,7 +243,7 @@
 	<!-- FOOTER -->
 	<footer class="footer2 container-fluid" style="background-color:#000; color:#FFF; padding:40px;">
 		<p class="pull-right"><a class="aRed" href="#">Back to top</a></p>
-		<p>&copy; 2014 - 2017 FailSafe Games</p>
+		<p>&copy; 2010 - 2017 FailSafe Games</p>
 	</footer>
 	</div>
     <!-- Bootstrap core JavaScript
