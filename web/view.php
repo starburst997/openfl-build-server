@@ -5,6 +5,8 @@
 
   $adminPassword = $password;
 
+  $hr = 0;
+
   $id = get('id');
   $git = get('git');
   $latest = false;
@@ -309,6 +311,10 @@
       margin-bottom: 10px;
     }
 
+    hr:last-of-type {
+      display: none;
+    }
+
 	</style>
   </head>
 <!-- NAVBAR
@@ -405,6 +411,7 @@
          <?php if ( $exists ): ?>
 
          <?php if ( $flash ): ?>
+         <?php $hr++; ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
 						<p class="versionTitle"><img src="images/platform_flash.jpg" height="60"> Flash <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=flash&password=$password"; ?>" target="_blank">View log</a></i></span></p>
@@ -425,11 +432,12 @@
 				 </div>
          <?php endif; ?>
 
-         <?php if ( $flash ): ?>
+         <?php if ( $hr > 0 && $hr-- > 0 ): ?>
 				 <HR>
          <?php endif; ?>
 
          <?php if ( $html5 ): ?>
+         <?php $hr++; ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
 						<p class="versionTitle"><img src="images/platform_html5.jpg" height="60"> HTML 5 <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=html5&password=$password"; ?>" target="_blank">View log</a></i></span></p>
@@ -455,11 +463,12 @@
 				 </div>
          <?php endif; ?>
 
-				 <?php if ( $html5 ): ?>
+				 <?php if ( $hr > 0 && $hr-- > 0 ): ?>
          <HR>
          <?php endif; ?>
 
          <?php if ( $android ): ?>
+         <?php $hr++; ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
 						<p class="versionTitle"><img src="images/platform_android.jpg" height="60"> Android <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=android&password=$password"; ?>" target="_blank">View log</a></i><?php if ( $googlebeta ): ?><br/><i><a href="<?php echo $googlebeta; ?>" target="_blank">Google Play Beta</a></i><?php endif; ?></span></p>
@@ -472,11 +481,12 @@
 				 </div>
          <?php endif; ?>
 
-         <?php if ( $android ): ?>
+         <?php if ( $hr > 0 && $hr-- > 0 ): ?>
          <HR>
          <?php endif; ?>
 
          <?php if ( $ios ): ?>
+         <?php $hr++; ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
 						<p class="versionTitle"><img src="images/platform_ios.jpg" height="60"> iOS <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=ios&password=$password"; ?>" target="_blank">View log</a></i><?php if ( $testflight ): ?><br/><i><a href="<?php echo $testflight; ?>" target="_blank">TestFlight Beta Signup</a></i><?php endif; ?></span></p>
@@ -489,11 +499,12 @@
 				 </div>
          <?php endif; ?>
 
-         <?php if ( $ios ): ?>
+         <?php if ( $hr > 0 && $hr-- > 0 ): ?>
          <HR>
          <?php endif; ?>
 
          <?php if ( $windows ): ?>
+         <?php $hr++; ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
 						<p class="versionTitle"><img src="images/platform_win.jpg" height="60"> Windows <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=windows&password=$password"; ?>" target="_blank">View log</a></i><?php if ( $windowsCert ): ?><br/><i><a href="<?php echo $windowsCert; ?>">Certificate for UWP</a> (<a href="https://docs.microsoft.com/en-us/windows/application-management/sideload-apps-in-windows-10" target="_blank">see</a>)</i><?php endif; ?></span></p>
@@ -515,11 +526,12 @@
 				 </div>
          <?php endif; ?>
 
-         <?php if ( $windows ): ?>
+         <?php if ( $hr > 0 && $hr-- > 0 ): ?>
          <HR>
          <?php endif; ?>
 
          <?php if ( $mac ): ?>
+         <?php $hr++; ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
 						<p class="versionTitle"><img src="images/platform_mac.jpg" height="60"> Mac OS <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=mac&password=$password"; ?>" target="_blank">View log</a></i></span></p>
@@ -538,11 +550,12 @@
 				 </div>
          <?php endif; ?>
 
-         <?php if ( $mac ): ?>
+         <?php if ( $hr > 0 && $hr-- > 0 ): ?>
          <HR>
          <?php endif; ?>
 
          <?php if ( $linux ): ?>
+         <?php $hr++; ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
 						<p class="versionTitle"><img src="images/platform_linux.jpg" height="60"> Linux <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=linux&password=$password"; ?>" target="_blank">View log</a></i></span></p>
@@ -559,10 +572,13 @@
          <?php endif; ?>
 
 
-          <HR>
+          <?php if ( $hr > 0 && $hr-- > 0 ): ?>
+         <HR>
+         <?php endif; ?>
+
           <?php endif; ?>
 
-        <br/>
+        <br/><br/><br/>
         <center><h3>Other Builds</h3></center>
         <br/>
 
