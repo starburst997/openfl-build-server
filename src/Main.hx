@@ -379,7 +379,7 @@ class Main
     h.setParameter('platform', platform);
     
     var e = error;
-    e = e.replace('\n', '<br>');
+    //e = e.replace('\n', '<br>');
     //error = error.replace('\r', '<br>');
     
     h.setParameter('error', '${e}');
@@ -429,7 +429,7 @@ class Main
     else
     {
       var content = File.getContent(f);
-      content = content.replace('\n', '<br>');
+      //content = content.replace('\n', '<br>');
       //content = content.replace('\r', '<br>');
       
       var bytes = Bytes.ofString(content);
