@@ -2152,8 +2152,27 @@ class Main
     }
     else
     {
+      // Project ios
+      if ( FileSystem.exists('project.ios.xml') )
+      {
+        FileSystem.deleteFile('project.ios.xml');
+      }
+      
+      var projectXML = File.getContent('project.xml');
+      projectXML = projectXML.replace('</project>', '<template path="templates_ignore" /></project>');
+      File.saveContent('project.ios.xml', projectXML);
+      
+      // Remove NSAllowArbritaryLoad
+      var infoPlist = File.getContent('${getPath()}/utils/info.plist');
+      FileSystem.createDirectory('templates_ignore/iphone/PROJ');
+      File.saveContent('templates_ignore/iphone/PROJ/PROJ-Info.plist', infoPlist);
+      
       createDir('Export/ios/final/${lime.app.file}/haxe/_generated');
-      log = call('haxelib run openfl build ios -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/ios.log');
+      log = call('haxelib run openfl build project.ios.xml ios -verbose -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/ios.log');
+      
+      // Cleanup
+      //removeDir('templates_ignore');
+      //FileSystem.deleteFile('project.ios.xml');
     }
     
     log = getLog('Release/ios.log');
