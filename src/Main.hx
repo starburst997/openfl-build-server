@@ -896,11 +896,13 @@ class Main
       if ( test == 0 )
       {
         trace('Removing Release / Export directory...');
-        removeDir('Release');
+        //removeDir('Release');
         removeDir('Export'); // Necessary???
         
-        createDir('Release');
+        //createDir('Release');
         createDir('Export');
+        
+        emptyDir('Release'); // Better since we can keep it open in OS
       }
       
       trace('');
@@ -1026,7 +1028,7 @@ class Main
   }
   
   // Remove a directory and everything inside
-  static function removeDir( path:String )
+  static function removeDir( path:String, rmDir:Bool = true )
   {
     if ( FileSystem.exists(path) && FileSystem.isDirectory(path) )
     {
@@ -1051,7 +1053,7 @@ class Main
       
       try
       {
-        FileSystem.deleteDirectory(path);
+        if ( rmDir ) FileSystem.deleteDirectory(path);
       }
       catch ( e:Dynamic )
       {
@@ -1061,7 +1063,7 @@ class Main
   }
   static function emptyDir( path:String )
   {
-    removeDir( path );
+    removeDir( path, false );
     
     if ( !FileSystem.exists( path ) )
     {
