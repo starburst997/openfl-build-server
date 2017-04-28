@@ -2025,25 +2025,6 @@ class Main
     // Copy .app
     var bytes:Bytes = null;
     
-    // Call command instead... Seems like some permission are lost or I dunno...
-    createDir('Release/app');
-    createDir('Release/store');
-    if ( project.json.legacy )
-    {
-      call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
-      call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/store/${lime.app.file}.app"');
-      //copyFolder('Export/mac64/cpp/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
-    }
-    else
-    {
-      call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
-      call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/store/${lime.app.file}.app"');
-      //copyFolder('Export/mac64/cpp/final/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
-    }
-    
-    call('sudo rm Release/app/${lime.app.file}.app/Contents/Entitlements.plist');
-    call('sudo rm Release/store/${lime.app.file}.app/Contents/Entitlements.plist');
-    
     // Installer
     installerMac( project, info, lime );
     
@@ -2074,6 +2055,26 @@ class Main
   static function installerMac( project:Project, info:ProjectInfo, lime:HXProject )
   {
     trace('Creating mac installer');
+    
+    // Call command instead... Seems like some permission are lost or I dunno...
+    emptyDir('Release/app');
+    emptyDir('Release/store');
+    
+    if ( project.json.legacy )
+    {
+      call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
+      call('cp -R "Export/mac64/cpp/bin/${lime.app.file}.app" "Release/store/${lime.app.file}.app"');
+      //copyFolder('Export/mac64/cpp/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
+    }
+    else
+    {
+      call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/app/${lime.app.file}.app"');
+      call('cp -R "Export/mac64/cpp/final/bin/${lime.app.file}.app" "Release/store/${lime.app.file}.app"');
+      //copyFolder('Export/mac64/cpp/final/bin/${lime.app.file}.app', 'Release/${lime.app.file}.app');
+    }
+    
+    call('sudo rm Release/app/${lime.app.file}.app/Contents/Entitlements.plist');
+    call('sudo rm Release/store/${lime.app.file}.app/Contents/Entitlements.plist');
     
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
