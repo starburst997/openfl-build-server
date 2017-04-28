@@ -1893,7 +1893,7 @@ class Main
     }
     
     // Cleanup
-    FileSystem.deleteFile('project.android.xml');
+    //FileSystem.deleteFile('project.android.xml');
     
     // Get log
     log = getLog('Release/android.log');
@@ -1930,6 +1930,24 @@ class Main
     script = script.replace('::JSON::', '${getPath()}/../google.json');
     File.saveContent('Release/deploy_android.sh', script);
     call('chmod +x Release/deploy_android.sh');
+    
+    // Quick build for testing
+    var quick = '';
+    if ( project.json.legacy )
+    {
+      quick = File.getContent('${getPath()}/utils/quick_android_legacy.sh');
+    }
+    else
+    {
+      quick = File.getContent('${getPath()}/utils/quick_android.sh');
+    }
+    
+    quick = quick.replace('::APK::', '${lime.app.file}-${git}.apk');
+    quick = quick.replace('::PKG::', '${pkg}');
+    quick = quick.replace('::GIT::', '${git}');
+    quick = quick.replace('::VERSION::', '${lime.meta.version}');
+    File.saveContent('Release/quick_android.sh', quick);
+    call('chmod +x Release/quick_android.sh');
     
     // Send to server
     if ( FileSystem.exists('Release/${lime.app.file}-${git}.apk') )
@@ -2127,8 +2145,8 @@ class Main
       log = call('haxelib run openfl build project.ios.xml ios -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy -Dsource-header=0 > Release/ios.log');
       
       // Cleanup
-      removeDir('templates_ignore');
-      FileSystem.deleteFile('project.ios.xml');
+      //removeDir('templates_ignore');
+      //FileSystem.deleteFile('project.ios.xml');
     }
     else
     {
@@ -2211,6 +2229,24 @@ class Main
     script = script.replace('::FILE::', 'ios/${lime.app.file}-${git}.ipa');
     File.saveContent('Release/deploy_ios.sh', script);
     call('chmod +x Release/deploy_ios.sh');
+    
+    // Quick build for testing
+    var quick = '';
+    if ( project.json.legacy )
+    {
+      quick = File.getContent('${getPath()}/utils/quick_ios_legacy.sh');
+      quick = quick.replace('::FILE::', '../Export/ios/build/Release-iphoneos/${lime.app.file}.app');
+    }
+    else
+    {
+      quick = File.getContent('${getPath()}/utils/quick_ios.sh');
+      quick = quick.replace('::FILE::', '../Export/ios/final/build/Release-iphoneos/${lime.app.file}.app');
+    }
+    
+    quick = quick.replace('::GIT::', '${git}');
+    quick = quick.replace('::VERSION::', '${lime.meta.version}');
+    File.saveContent('Release/quick_ios.sh', quick);
+    call('chmod +x Release/quick_ios.sh');
     
     // Send to server
     if ( FileSystem.exists('Export/ios/build/Release-iphoneos/${lime.app.file}.app') || FileSystem.exists('Export/ios/final/build/Release-iphoneos/${lime.app.file}.app') )
