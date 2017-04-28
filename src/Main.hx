@@ -2246,6 +2246,21 @@ class Main
     File.saveContent('Release/ios.sh', script);
     call('chmod +x Release/ios.sh');
     
+    // Debug ios script
+    script = File.getContent('${getPath()}/utils/debug_ios.sh');
+    
+    if ( project.json.legacy )
+    {
+      script = script.replace('::FILE::', '../Export/ios/build/Release-iphoneos/${lime.app.file}.app');
+    }
+    else
+    {
+      script = script.replace('::FILE::', '../Export/ios/final/build/Release-iphoneos/${lime.app.file}.app');
+    }
+    
+    File.saveContent('Release/debug_ios.sh', script);
+    call('chmod +x Release/debug_ios.sh');
+    
     // Deploy ios script
     var script = File.getContent('${getPath()}/utils/deploy_ios.sh');
     script = script.replace('::FILE::', 'ios/${lime.app.file}-${git}.ipa');
