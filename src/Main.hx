@@ -145,6 +145,8 @@ class Main
   static var fix = false; // Hack
   static var test = 0; // Run tests for debugging
   
+  static var deploy = false;
+  
 	// Starting point
 	static function main() 
 	{
@@ -210,6 +212,14 @@ class Main
         action = 'build';
         rel = './projects';
         if ( (args.length > 1) && (Std.parseInt(args[1]) > 0) ) test = Std.parseInt(args[1]);
+      }
+    }
+    
+    for ( arg in args )
+    {
+      if ( arg == "deploy" )
+      {
+        deploy = true;
       }
     }
     
@@ -938,6 +948,13 @@ class Main
             {
               compileMac( project, p, limeProject );
               compileIOS( project, p, limeProject );
+              
+              // Finally deploy
+              if ( deploy )
+              {
+                deployIOS( project, p, limeProject );
+                deployMac( project, p, limeProject );
+              }
             }
           }
         case 'Linux':
@@ -958,6 +975,12 @@ class Main
               compileLinux( project, p, limeProject );
               //compileLinux32( project, p, limeProject ); // Seems broken
               compileAndroid( project, p, limeProject );
+              
+              // Finally deploy
+              if ( deploy )
+              {
+                deployAndroid( project, p, limeProject );
+              }
             }
           }
       }
@@ -970,6 +993,20 @@ class Main
         break;
       }
     }
+  }
+  
+  // Deploy
+  static function deployIOS( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    call('Release/deploy_ios.sh');
+  }
+  static function deployMac( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    call('Release/deploy_mac.sh');
+  }
+  static function deployAndroid( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    call('Release/deploy_android.sh');
   }
   
   // Get full path from CWD
