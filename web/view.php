@@ -32,7 +32,9 @@
   if ( $beta == '1' )
   {
     $latest = true;
-    $git = "beta";
+
+    $l = loadLatest($id, "beta");
+    $git = "beta/".$l['version'];
   }
 
   if ( file_exists("./builds/$id/config.php") )

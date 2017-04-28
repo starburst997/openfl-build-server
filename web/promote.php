@@ -36,39 +36,40 @@
 
       if ( file_exists("./builds/$id/$git") )
       {
-        // Copy everything to beta
-        copyDir("./builds/$id/$git", "./builds/$id/beta");
-
         // Add info.txt
         $gits = loadGit($id);
         foreach ( $gits as $key=>$value )
         {
           if ( $value['git'] == $git )
           {
+            // Copy everything to beta
+            copyDir("./builds/$id/$git", "./builds/$id/beta/".$value['version']);
+
             $file = fopen("./builds/$id/beta/git.txt", "w") or die("Unable to open file!");
             fwrite($file, $value['git'].":".$value['sort'].":".$value['version']);
             fclose($file);
+
+            // Redirect
+            header("Location: ./view.php?id=$id&beta=1&password=$password");
+            die();
+
             break;
           }
         }
-
-        // Redirect
-        header("Location: ./view.php?id=$id&beta=1&password=$password");
-        die();
       }
     }
     else if ( $release == '1' )
     {
-      // Promote beta to release
-      if ( file_exists("./builds/$id/beta") )
+      $beta = loadLatest($id, "beta");
+
+      if ( !$beta )
       {
-        $beta = loadLatest($id, "beta");
+        die('Invalid beta');
+      }
 
-        if ( !$beta )
-        {
-          die('Invalid beta');
-        }
-
+      // Promote beta to release
+      if ( file_exists("./builds/$id/beta/".$beta['version']) )
+      {
         if ( !file_exists("./builds/$id/release") )
         {
           mkdir("./builds/$id/release");
@@ -86,7 +87,7 @@
         }
 
         // Copy file
-        copyDir("./builds/$id/beta", "./builds/$id/release/".$beta['version']);
+        copyDir("./builds/$id/beta/".$beta['version'], "./builds/$id/release/".$beta['version']);
 
         // Write git.txt
         if ( !file_exists("./builds/$id/release/git.txt") )
@@ -130,7 +131,7 @@
           mkdir("./builds/$id/release/latest");
         }
 
-        copyDir("./builds/$id/beta", "./builds/$id/release/latest", $beta['git']);
+        copyDir("./builds/$id/beta/".$beta['version'], "./builds/$id/release/latest", $beta['git']);
 
         // Redirect
         header("Location: ./view.php?id=$id&release=".$beta['version']."&password=$password");
