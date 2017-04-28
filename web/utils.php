@@ -11,6 +11,16 @@
     return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . " " . @$sz[$factor];
   }
 
+  // Get IP
+  function getIP()
+  {
+    $ip = getenv('REMOTE_ADDR');
+
+    $array = explode(':', $ip);
+
+    return $array[count($array) - 1];
+  }
+
   // Get a var
   function get($name, $check = true)
   {

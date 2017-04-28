@@ -15,7 +15,7 @@
   // Check IP is valid
   if ( isset($ip) && ($ip != "") )
   {
-    if ( getenv('REMOTE_ADDR') != $ip )
+    if ( getIP() != $ip )
     {
       die('Not authorized');
     }
