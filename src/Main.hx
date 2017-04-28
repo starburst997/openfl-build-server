@@ -2013,7 +2013,7 @@ class Main
     
     if ( FileSystem.exists('project.mac.xml') )
     {
-      FileSystem.deleteFile('project.mac.xml');
+      //FileSystem.deleteFile('project.mac.xml');
     }
     
     log = getLog('Release/mac.log');
