@@ -311,7 +311,7 @@ class Main
 	}
   
   // Send to server async
-  static function sendServer( id:String, platform:String, file:String )
+  static function sendServer( id:String, platform:String, file:String, version:String )
   {
     // Fix?
     Sys.sleep(1);
@@ -325,6 +325,7 @@ class Main
     h.setParameter('password', password);
     
     h.setParameter('id', id);
+    h.setParameter('version', version);
     h.setParameter('git', git);
     h.setParameter('platform', platform);
     
@@ -359,7 +360,7 @@ class Main
   }
   
   // Send to server async
-  static function sendError( id:String, platform:String, error:String )
+  static function sendError( id:String, platform:String, error:String, version:String )
   {
     // Fix?
     Sys.sleep(1);
@@ -373,6 +374,7 @@ class Main
     h.setParameter('password', password);
     
     h.setParameter('id', id);
+    h.setParameter('version', version);
     h.setParameter('git', git);
     h.setParameter('platform', platform);
     
@@ -401,7 +403,7 @@ class Main
   }
   
   // Send to server async
-  static function sendLogServer( id:String, platform:String, file:String )
+  static function sendLogServer( id:String, platform:String, file:String, version:String )
   {
     // Fix?
     Sys.sleep(1);
@@ -415,6 +417,7 @@ class Main
     h.setParameter('password', password);
     
     h.setParameter('id', id);
+    h.setParameter('version', version);
     h.setParameter('git', git);
     h.setParameter('platform', platform);
     
@@ -953,6 +956,7 @@ class Main
             else
             {
               compileLinux( project, p, limeProject );
+              //compileLinux32( project, p, limeProject ); // Seems broken
               compileAndroid( project, p, limeProject );
             }
           }
@@ -1252,17 +1256,17 @@ class Main
     // Send to server
     if ( FileSystem.exists('Release/html5/${lime.app.file}.js') )
     {
-      sendServer('${lime.app.file}', 'html5', 'Release/${lime.app.file}-html5-${git}.zip');
-      sendLogServer('${lime.app.file}', 'html5', 'Release/html5.log');
+      sendServer('${lime.app.file}', 'html5', 'Release/${lime.app.file}-html5-${git}.zip', lime.meta.version);
+      sendLogServer('${lime.app.file}', 'html5', 'Release/html5.log', lime.meta.version);
     }
     else if ( FileSystem.exists('Release/html5.log') )
     {
       var log = File.getContent('Release/html5.log');
-      sendError('${lime.app.file}', 'html5', 'Compile error:\n\n${log}');
+      sendError('${lime.app.file}', 'html5', 'Compile error:\n\n${log}', lime.meta.version);
     }
     else
     {
-      sendError('${lime.app.file}', 'html5', 'Fatal Error: Not even a log output!');
+      sendError('${lime.app.file}', 'html5', 'Fatal Error: Not even a log output!', lime.meta.version);
     }
   }
   
@@ -1314,17 +1318,17 @@ class Main
     // Send to server
     if ( FileSystem.exists('Release/windows/${lime.app.file}.exe') )
     {
-      sendServer('${lime.app.file}', 'windows', 'Release/${lime.app.file}-windows-${git}.zip');
-      sendLogServer('${lime.app.file}', 'windows', 'Release/windows.log');
+      sendServer('${lime.app.file}', 'windows', 'Release/${lime.app.file}-windows-${git}.zip', lime.meta.version);
+      sendLogServer('${lime.app.file}', 'windows', 'Release/windows.log', lime.meta.version);
     }
     else if ( FileSystem.exists('Release/windows.log') )
     {
       var log = File.getContent('Release/windows.log');
-      sendError('${lime.app.file}', 'windows', 'Compile error:\n\n${log}');
+      sendError('${lime.app.file}', 'windows', 'Compile error:\n\n${log}', lime.meta.version);
     }
     else
     {
-      sendError('${lime.app.file}', 'windows', 'Fatal Error: Not even a log output!');
+      sendError('${lime.app.file}', 'windows', 'Fatal Error: Not even a log output!', lime.meta.version);
     }
   }
   
@@ -1412,8 +1416,8 @@ class Main
     call('crx pack Release/html5-crx -o Release/${lime.app.file}-${git}.crx -p certificates/key.pem --zip-output Release/${lime.app.file}-chrome-${git}.zip');
     
     // Send server
-    sendServer('${lime.app.file}', 'chrome-crx', 'Release/${lime.app.file}-${git}.crx');
-    sendServer('${lime.app.file}', 'chrome', 'Release/${lime.app.file}-chrome-${git}.zip');
+    sendServer('${lime.app.file}', 'chrome-crx', 'Release/${lime.app.file}-${git}.crx', lime.meta.version);
+    sendServer('${lime.app.file}', 'chrome', 'Release/${lime.app.file}-chrome-${git}.zip', lime.meta.version);
   }
   static function installerHTML5APPX( project:Project, info:ProjectInfo, lime:HXProject )
   {
@@ -1562,7 +1566,7 @@ class Main
     Sys.command('signtool.exe sign -f certificates/my.pfx -fd SHA256 -v Release/${lime.app.file}-html5-${git}.appx');
     
     // Send to server
-    sendServer('${lime.app.file}', 'windows-html5-appx', 'Release/${lime.app.file}-html5-${git}.appx');
+    sendServer('${lime.app.file}', 'windows-html5-appx', 'Release/${lime.app.file}-html5-${git}.appx', lime.meta.version);
   }
   static function installerAPPX( project:Project, info:ProjectInfo, lime:HXProject )
   {
@@ -1678,8 +1682,8 @@ class Main
     Sys.command('signtool.exe sign -f certificates/my.pfx -fd SHA256 -v Release/${lime.app.file}-${git}.appx');
     
     // Send to server
-    sendServer('${lime.app.file}', 'windows-cert', 'certificates/my.cer');
-    sendServer('${lime.app.file}', 'windows-appx', 'Release/${lime.app.file}-${git}.appx');
+    sendServer('${lime.app.file}', 'windows-cert', 'certificates/my.cer', lime.meta.version);
+    sendServer('${lime.app.file}', 'windows-appx', 'Release/${lime.app.file}-${git}.appx', lime.meta.version);
   }
   static function unixPath( path:String )
   {
@@ -1739,7 +1743,7 @@ class Main
     call('makensis Release/installer.nsi');
     
     // Send to server
-    sendServer('${lime.app.file}', 'windows-setup', 'Release/${lime.app.file}-${git}.exe');
+    sendServer('${lime.app.file}', 'windows-setup', 'Release/${lime.app.file}-${git}.exe', lime.meta.version);
   }
   static function fileDirectoryWindows( path:String, outPath:String = "$INSTDIR" )
   {
@@ -1893,17 +1897,17 @@ class Main
     // Send to server
     if ( FileSystem.exists('Release/${lime.app.file}-${git}.apk') )
     {
-      sendServer('${lime.app.file}', 'android', 'Release/${lime.app.file}-${git}.apk');
-      sendLogServer('${lime.app.file}', 'android', 'Release/android.log');
+      sendServer('${lime.app.file}', 'android', 'Release/${lime.app.file}-${git}.apk', lime.meta.version);
+      sendLogServer('${lime.app.file}', 'android', 'Release/android.log', lime.meta.version);
     }
     else if ( FileSystem.exists('Release/android.log') )
     {
       var log = File.getContent('Release/android.log');
-      sendError('${lime.app.file}', 'android', 'Compile error:\n\n${log}');
+      sendError('${lime.app.file}', 'android', 'Compile error:\n\n${log}', lime.meta.version);
     }
     else
     {
-      sendError('${lime.app.file}', 'android', 'Fatal Error: Not even a log output!');
+      sendError('${lime.app.file}', 'android', 'Fatal Error: Not even a log output!', lime.meta.version);
     }
   }
   
@@ -1995,17 +1999,17 @@ class Main
     // Send to server
     if ( FileSystem.exists('Release/app/${lime.app.file}.app') )
     {
-      sendServer('${lime.app.file}', 'mac', 'Release/${lime.app.file}-${git}.dmg');
-      sendLogServer('${lime.app.file}', 'mac', 'Release/mac.log');
+      sendServer('${lime.app.file}', 'mac', 'Release/${lime.app.file}-${git}.dmg', lime.meta.version);
+      sendLogServer('${lime.app.file}', 'mac', 'Release/mac.log', lime.meta.version);
     }
     else if ( FileSystem.exists('Release/mac.log') )
     {
       var log = File.getContent('Release/mac.log');
-      sendError('${lime.app.file}', 'mac', 'Compile error:\n\n${log}');
+      sendError('${lime.app.file}', 'mac', 'Compile error:\n\n${log}', lime.meta.version);
     }
     else
     {
-      sendError('${lime.app.file}', 'mac', 'Fatal Error: Not even a log output!');
+      sendError('${lime.app.file}', 'mac', 'Fatal Error: Not even a log output!', lime.meta.version);
     }
   }
   
@@ -2043,8 +2047,8 @@ class Main
       call('codesign -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/${lime.app.file}-${git}.dmg"');
       
       // Send server
-      sendServer('${lime.app.file}', 'mac-setup', 'Release/${lime.app.file}-${git}.pkg');
-      sendServer('${lime.app.file}', 'mac-store', 'Release/osx/${lime.app.file}-store-${git}.pkg');
+      sendServer('${lime.app.file}', 'mac-setup', 'Release/${lime.app.file}-${git}.pkg', lime.meta.version);
+      sendServer('${lime.app.file}', 'mac-store', 'Release/osx/${lime.app.file}-store-${git}.pkg', lime.meta.version);
     }
   }
   
@@ -2174,18 +2178,151 @@ class Main
     // Send to server
     if ( FileSystem.exists('Export/ios/build/Release-iphoneos/${lime.app.file}.app') || FileSystem.exists('Export/ios/final/build/Release-iphoneos/${lime.app.file}.app') )
     {
-      sendServer('${lime.app.file}', 'ios', 'Release/ios/${lime.app.file}-${git}.ipa');
-      sendLogServer('${lime.app.file}', 'ios', 'Release/ios.log');
+      sendServer('${lime.app.file}', 'ios', 'Release/ios/${lime.app.file}-${git}.ipa', lime.meta.version);
+      sendLogServer('${lime.app.file}', 'ios', 'Release/ios.log', lime.meta.version);
     }
     else if ( FileSystem.exists('Release/ios.log') )
     {
       var log = File.getContent('Release/ios.log');
-      sendError('${lime.app.file}', 'ios', 'Compile error:\n\n${log}');
+      sendError('${lime.app.file}', 'ios', 'Compile error:\n\n${log}', lime.meta.version);
     }
     else
     {
-      sendError('${lime.app.file}', 'ios', 'Fatal Error: Not even a log output!');
+      sendError('${lime.app.file}', 'ios', 'Fatal Error: Not even a log output!', lime.meta.version);
     }
+  }
+  
+  // Compile Linux
+  static function compileLinux32( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    trace("- LINUX -");
+    
+    // Compile
+    var log:String = '';
+    
+    if ( project.json.legacy )
+    {
+      log = call('haxelib run openfl build linux -32 -verbose -Dlegacy > Release/linux32.log');
+    }
+    else
+    {
+      createDir('Export/linux/cpp/final/haxe/_generated');
+      log = call('haxelib run openfl build linux -32 -verbose -final > Release/linux32.log');
+    }
+    
+    log = getLog('Release/linux32.log');
+    
+    trace('');
+    Sys.print(log);
+    trace('');
+    
+    // Create .deb package for linux
+    installerLinux32( project, info, lime );
+  }
+  static function installerLinux32( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    emptyDir('Release/bin');
+    
+    if ( project.json.legacy )
+    {
+      call('cp -R Export/linux/cpp/bin Release');
+    }
+    else
+    {
+      call('cp -R Export/linux/cpp/final/bin Release');
+    }
+    
+    // Create deb
+    emptyDir('Release/deb');
+    createDir('Release/deb/DEBIAN');
+    //createDir('Release/deb/opt/${lime.app.file}');
+    createDir('Release/deb/usr/bin');
+    createDir('Release/deb/usr/share/applications');
+    createDir('Release/deb/usr/share/icons/hicolor/16x16/apps');
+    createDir('Release/deb/usr/share/icons/hicolor/32x32/apps');
+    createDir('Release/deb/usr/share/icons/hicolor/48x48/apps');
+    createDir('Release/deb/usr/share/icons/hicolor/128x128/apps');
+    createDir('Release/deb/usr/share/icons/hicolor/256x256/apps');
+    
+    createDir('Release/deb/opt');
+    call('cp -R Release/bin Release/deb/opt/${lime.app.file}');
+    
+    createDir('Release/deb/opt/${lime.app.file}/Icon/16x16');
+    createDir('Release/deb/opt/${lime.app.file}/Icon/32x32');
+    createDir('Release/deb/opt/${lime.app.file}/Icon/48x48');
+    createDir('Release/deb/opt/${lime.app.file}/Icon/128x128');
+    createDir('Release/deb/opt/${lime.app.file}/Icon/256x256');
+    
+    // Bin
+    var bin = File.getContent('${getPath()}/utils/deb/file');
+    bin = bin.replace('::FILE::', '${lime.app.file}');
+    File.saveContent('Release/deb/usr/bin/${lime.app.file}', bin);
+    call('chmod +x Release/deb/usr/bin/${lime.app.file}');
+    
+    var run = File.getContent('${getPath()}/utils/deb/run.sh');
+    run = run.replace('::FILE::', '${lime.app.file}');
+    File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.sh', run);
+    call('chmod +x Release/deb/opt/${lime.app.file}/${lime.app.file}.sh');
+    
+    // Desktop
+    var desktop = File.getContent('${getPath()}/utils/deb/file.desktop');
+    desktop = desktop.replace('::VERSION::', '${lime.meta.version}');
+    desktop = desktop.replace('::NAME::', '${lime.meta.title}');
+    desktop = desktop.replace('::FILE::', '${lime.app.file}');
+    File.saveContent('Release/deb/usr/share/applications/${lime.app.file}.desktop', desktop);
+    
+    // Create icons
+    var squares:Array<Icon> = [
+      {name: '${lime.app.file}.png', width: 16, height: 16},
+      {name: '${lime.app.file}.png', width: 32, height: 32},
+      {name: '${lime.app.file}.png', width: 48, height: 48},
+      {name: '${lime.app.file}.png', width: 128, height: 128},
+      {name: '${lime.app.file}.png', width: 256, height: 256},
+    ];
+    for ( icon in squares )
+    {
+      call('convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/deb/usr/share/icons/hicolor/${icon.width}x${icon.height}/apps/${icon.name}');
+      call('convert utils/icon.png -resize ${icon.width}x${icon.height} -crop ${icon.width}x${icon.height}+0+0 -strip +repage Release/deb/opt/${lime.app.file}/Icon/${icon.width}x${icon.height}/${icon.name}');
+    }
+    
+    // Control file
+    var size = getCall('du -ks Release/deb|cut -f 1').replace('\n', '');
+    var control = File.getContent('${getPath()}/utils/deb/control32');
+    control = control.replace('::PUBLISHER::', '${config.publisher}');
+    control = control.replace('::VERSION::', '${lime.meta.version}');
+    control = control.replace('::NAME::', '${lime.meta.title}');
+    control = control.replace('::FILE::', '${lime.app.file}');
+    control = control.replace('::EMAIL::', 'jeandenis.boivin@gmail.com');
+    control = control.replace('::SIZE::', '${size}');
+    File.saveContent('Release/deb/DEBIAN/control', control);
+    
+    // Build
+    call('dpkg-deb --build Release/deb Release/${lime.app.file}_${git}_i386.deb');
+    
+    // Create portable
+    File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop', desktop);
+    
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/deb/opt');
+    call('tar -cvjSf ../../${lime.app.file}_${git}_x32.tar.bz2 ${lime.app.file}');
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}');
+    
+    // Send to server
+    if ( FileSystem.exists('Release/bin/${lime.app.file}') )
+    {
+      sendServer('${lime.app.file}', 'linux32', 'Release/${lime.app.file}_${git}_x32.tar.bz2', lime.meta.version);
+      sendLogServer('${lime.app.file}', 'linux32', 'Release/linux32.log', lime.meta.version);
+    }
+    else if ( FileSystem.exists('Release/linux32.log') )
+    {
+      var log = File.getContent('Release/linux32.log');
+      sendError('${lime.app.file}', 'linux32', 'Compile error:\n\n${log}', lime.meta.version);
+    }
+    else
+    {
+      sendError('${lime.app.file}', 'linux32', 'Fatal Error: Not even a log output!', lime.meta.version);
+    }
+    
+    sendServer('${lime.app.file}', 'ubuntu32', 'Release/${lime.app.file}_${git}_i386.deb', lime.meta.version);
   }
   
   // Compile Linux
@@ -2214,13 +2351,10 @@ class Main
     
     // Create .deb package for linux
     installerLinux( project, info, lime );
-    
-    // Send to server
-    
   }
   static function installerLinux( project:Project, info:ProjectInfo, lime:HXProject )
   {
-    emptyDir('Release/linux');
+    emptyDir('Release/bin');
     
     if ( project.json.legacy )
     {
@@ -2308,20 +2442,20 @@ class Main
     // Send to server
     if ( FileSystem.exists('Release/bin/${lime.app.file}') )
     {
-      sendServer('${lime.app.file}', 'linux', 'Release/${lime.app.file}_${git}_x64.tar.bz2');
-      sendLogServer('${lime.app.file}', 'linux', 'Release/linux.log');
+      sendServer('${lime.app.file}', 'linux', 'Release/${lime.app.file}_${git}_x64.tar.bz2', lime.meta.version);
+      sendLogServer('${lime.app.file}', 'linux', 'Release/linux.log', lime.meta.version);
     }
     else if ( FileSystem.exists('Release/linux.log') )
     {
       var log = File.getContent('Release/linux.log');
-      sendError('${lime.app.file}', 'linux', 'Compile error:\n\n${log}');
+      sendError('${lime.app.file}', 'linux', 'Compile error:\n\n${log}', lime.meta.version);
     }
     else
     {
-      sendError('${lime.app.file}', 'linux', 'Fatal Error: Not even a log output!');
+      sendError('${lime.app.file}', 'linux', 'Fatal Error: Not even a log output!', lime.meta.version);
     }
     
-    sendServer('${lime.app.file}', 'ubuntu', 'Release/${lime.app.file}_${git}_amd64.deb');
+    sendServer('${lime.app.file}', 'ubuntu', 'Release/${lime.app.file}_${git}_amd64.deb', lime.meta.version);
   }
   
   // Get projects by reading the specified folder in cwd
