@@ -12,5 +12,6 @@
   $microsoftstore = "";
   $amazonstore = "";
   $ip = "";
+  $analytics = "";
 
 ?>
