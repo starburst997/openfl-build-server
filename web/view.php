@@ -449,7 +449,7 @@
          <?php if ( $android ): ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
-						<p class="versionTitle"><img src="images/platform_android.jpg" height="60"> Android <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=android&password=$password"; ?>" target="_blank">View log</a></i><?php if ( $googlebeta ): ?><br/><i><a href="<?php echo $googlebeta; ?>">Google Play Beta</a></i><?php endif; ?></span></p>
+						<p class="versionTitle"><img src="images/platform_android.jpg" height="60"> Android <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=android&password=$password"; ?>" target="_blank">View log</a></i><?php if ( $googlebeta ): ?><br/><i><a href="<?php echo $googlebeta; ?>" target="_blank">Google Play Beta</a></i><?php endif; ?></span></p>
 					 </div>
 					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
 						<?php if ( $android ): ?>
@@ -466,7 +466,7 @@
          <?php if ( $ios ): ?>
 				 <div class="versionEntry verticalAlign">
 					 <div class="col-md-6 col-sm-6 noPadMar versionDesc">
-						<p class="versionTitle"><img src="images/platform_ios.jpg" height="60"> iOS <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=ios&password=$password"; ?>" target="_blank">View log</a></i><?php if ( $testflight ): ?><br/><i><a href="<?php echo $testflight; ?>">TestFlight Beta Signup</a></i><?php endif; ?></span></p>
+						<p class="versionTitle"><img src="images/platform_ios.jpg" height="60"> iOS <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=ios&password=$password"; ?>" target="_blank">View log</a></i><?php if ( $testflight ): ?><br/><i><a href="<?php echo $testflight; ?>" target="_blank">TestFlight Beta Signup</a></i><?php endif; ?></span></p>
 					 </div>
 					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
 						<?php if ( $ios ): ?>

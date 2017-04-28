@@ -4,6 +4,9 @@
   include("utils.php");
 
   include("SensioLabs/AnsiConverter/AnsiToHtmlConverter.php");
+  include("SensioLabs/AnsiConverter/Theme/Theme.php");
+
+  use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 
   $N = 10;
 
@@ -74,10 +77,6 @@
         $gits[] = $build;
 
         // Sort builds
-        function sortCustom($a, $b) {
-          return $b['sort'] - $a['sort'];
-        }
-
         usort($gits, 'sortCustom');
 
         // If we are over N delete oldest
@@ -113,7 +112,7 @@
       //$error = str_replace("<br>", "\n", $error);
       //$error = str_replace("<br>", "\r", $error);
 
-      use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
+      //use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
       $converter = new AnsiToHtmlConverter();
       $html = $converter->convert($error);
 
@@ -150,7 +149,7 @@
       //$logContent = str_replace("<br>", "\n", $logContent);
       //$logContent = str_replace("<br>", "\r", $logContent);
 
-      use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
+      //use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
       $converter = new AnsiToHtmlConverter();
       $html = $converter->convert($logContent);
 
