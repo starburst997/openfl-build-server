@@ -2182,55 +2182,6 @@ class Main
     Sys.print(log);
     trace('');
     
-    // Yup, building again with fastlane... (I know, will figure out something better, but currently have an issue with turning the .app into .ipa)
-    var bytes:Bytes = null;
-    
-    FileSystem.createDirectory('Release/ios');
-    
-    // Add fullscreen required for ios submission (yup another hack, but whatev, I just want this to works...)
-    /*
-    if ( project.json.legacy )
-    {
-      if ( FileSystem.exists('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist') )
-      {
-        var plist = File.getContent('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist');
-        FileSystem.deleteFile('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist');
-        
-        plist = plist.replace('</dict>', '<key>UIRequiresFullScreen</key><true/></dict>');
-        File.saveContent('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist', plist);
-      }
-    }
-    */
-    
-    //call('fastlane sigh -a ${lime.meta.pkg} -u failsafegames@gmail.com');
-    
-    if ( project.json.legacy )
-    {
-      call('fastlane run recreate_schemes project:Export/ios/${lime.app.file}.xcodeproj');
-      
-      if ( lime.certificate != null )
-      {
-        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release/ios -n ${lime.app.file}-${git}');
-      }
-      else
-      {
-        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release/ios -n ${lime.app.file}-${git}');
-      }
-    }
-    else
-    {
-      call('fastlane run recreate_schemes project:Export/ios/final/${lime.app.file}.xcodeproj');
-      
-      if ( lime.certificate != null )
-      {
-        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -g ${lime.certificate.teamID} -o Release/ios -n ${lime.app.file}-${git}');
-      }
-      else
-      {
-        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -o Release/ios -n ${lime.app.file}-${git}');
-      }
-    }
-    
     // Test ios script
     var script = File.getContent('${getPath()}/utils/ios.sh');
     
@@ -2284,6 +2235,55 @@ class Main
     quick = quick.replace('::VERSION::', '${lime.meta.version}');
     File.saveContent('Release/quick_ios.sh', quick);
     call('chmod +x Release/quick_ios.sh');
+    
+    // Yup, building again with fastlane... (I know, will figure out something better, but currently have an issue with turning the .app into .ipa)
+    var bytes:Bytes = null;
+    
+    FileSystem.createDirectory('Release/ios');
+    
+    // Add fullscreen required for ios submission (yup another hack, but whatev, I just want this to works...)
+    /*
+    if ( project.json.legacy )
+    {
+      if ( FileSystem.exists('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist') )
+      {
+        var plist = File.getContent('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist');
+        FileSystem.deleteFile('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist');
+        
+        plist = plist.replace('</dict>', '<key>UIRequiresFullScreen</key><true/></dict>');
+        File.saveContent('Export/ios/${lime.app.file}/${lime.app.file}-Info.plist', plist);
+      }
+    }
+    */
+    
+    //call('fastlane sigh -a ${lime.meta.pkg} -u failsafegames@gmail.com');
+    
+    if ( project.json.legacy )
+    {
+      call('fastlane run recreate_schemes project:Export/ios/${lime.app.file}.xcodeproj');
+      
+      if ( lime.certificate != null )
+      {
+        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -g ${lime.certificate.teamID} -o Release/ios -n ${lime.app.file}-${git}');
+      }
+      else
+      {
+        call('fastlane gym -p Export/ios/${lime.app.file}.xcodeproj -o Release/ios -n ${lime.app.file}-${git}');
+      }
+    }
+    else
+    {
+      call('fastlane run recreate_schemes project:Export/ios/final/${lime.app.file}.xcodeproj');
+      
+      if ( lime.certificate != null )
+      {
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -g ${lime.certificate.teamID} -o Release/ios -n ${lime.app.file}-${git}');
+      }
+      else
+      {
+        call('fastlane gym -p Export/ios/final/${lime.app.file}.xcodeproj -s ${lime.app.file} -o Release/ios -n ${lime.app.file}-${git}');
+      }
+    }
     
     // Send to server
     if ( FileSystem.exists('Export/ios/build/Release-iphoneos/${lime.app.file}.app') || FileSystem.exists('Export/ios/final/build/Release-iphoneos/${lime.app.file}.app') )
