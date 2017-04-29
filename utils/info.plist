@@ -4,36 +4,8 @@
 <dict>
 	<!--<key>NSAppTransportSecurity</key>
 	<dict>
-	  <key>NSExceptionDomains</key>
-	  <dict>
-	    <key>notessimo.net</key>
-	    <dict>
-	      <key>NSIncludesSubdomains</key>
-	      <true/>
-	      <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-	      <true/>
-	    </dict>
-	    <key>failsafegames.com</key>
-	    <dict>
-	      <key>NSIncludesSubdomains</key>
-	      <true/>
-	      <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-	      <true/>
-	    </dict>
-	    <key>pin-town.com</key>
-	    <dict>
-	      <key>NSIncludesSubdomains</key>
-	      <true/>
-	      <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-	      <true/>
-	    </dict>
-	  </dict>
-	</dict>-->
-
-	<key>NSAppTransportSecurity</key>
-	<dict>
 		<key>NSAllowsArbitraryLoads</key><true/>
-	</dict>
+	</dict>-->
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
