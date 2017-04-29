@@ -1,3 +1,3 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-ios-deploy --debug --bundle ::FILE::
+ios-deploy --debug --verbose --bundle ::FILE::
