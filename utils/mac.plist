@@ -3,8 +3,8 @@
   <dict>
     <key>com.apple.security.app-sandbox</key>
     <true/>
-  </dict>
-  <dict>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
     <key>com.apple.security.network.client</key>
     <true/>
   </dict>
