@@ -39,6 +39,7 @@
 			::if value::<true/>::else::<false/>::end::
 		::end::
 	</dict>
+
 	<key>UIStatusBarHidden</key>
 	<::WIN_FULLSCREEN::/>
 	<key>UIRequiresFullScreen</key>
@@ -48,5 +49,13 @@
 	::if (IOS_APP_ORIENTATION != null)::
 	<key>UISupportedInterfaceOrientations</key>
 	::IOS_APP_ORIENTATION::::end::
+
+	<key>UISupportedInterfaceOrientations~ipad</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationPortraitUpsideDown</string>
+    <string>UIInterfaceOrientationLandscapeLeft</string>
+    <string>UIInterfaceOrientationLandscapeRight</string>
+  </array>
 </dict>
 </plist>
