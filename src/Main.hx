@@ -2063,6 +2063,18 @@ class Main
   {
     trace('Creating mac installer');
     
+    // Get mac package
+    var macpkg = '${lime.meta.pkg}';
+    var xml:String = File.getContent('project.xml');
+    var fast = new Fast( Xml.parse(xml).firstElement() );
+    for ( node in fast.nodes.meta )
+    {
+      if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'mac') )
+      {
+        macpkg = node.att.resolve('package');
+      }
+    }
+    
     // Call command instead... Seems like some permission are lost or I dunno...
     emptyDir('Release/app');
     emptyDir('Release/store');
@@ -2106,7 +2118,7 @@ class Main
       }*/
       
       entitlements = entitlements.replace('::TEAM_ID::', '${lime.certificate.teamID}');
-      entitlements = entitlements.replace('::PKG::', '${lime.meta.pkg}');
+      entitlements = entitlements.replace('::PKG::', macpkg);
       
       File.saveContent('Release/mac.plist', entitlements);
       
@@ -2142,7 +2154,7 @@ class Main
       for ( file in FileSystem.readDirectory('Release/store/${lime.app.file}.app/Contents/MacOS') )
       {
         trace('Signing: ${file}');
-        call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/Contents/MacOS/${file}" --entitlements "${getPath()}/utils/child.plist"');
+        call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/Contents/MacOS/${file}" --entitlements "${getPath()}/utils/child.plist"');
       }
       
       //call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "Release/mac_store.plist"');
