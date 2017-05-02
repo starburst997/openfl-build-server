@@ -2138,7 +2138,7 @@ class Main
       // Also, seems like when we distribute outside, we don't want any provisionprofile (why is there an option on the website?) and no entitlements...
       
       // Sign
-      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep"');
+      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep');
       
       /*for ( file in FileSystem.readDirectory('Release/app/${lime.app.file}.app/Contents/MacOS') )
       {
