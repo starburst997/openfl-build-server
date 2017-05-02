@@ -2123,26 +2123,30 @@ class Main
       File.saveContent('Release/mac.plist', entitlements);
       
       // Add provisionProfile
-      if ( FileSystem.exists('provisions/prod.provisionprofile') )
+      /*if ( FileSystem.exists('provisions/prod.provisionprofile') )
       {
         File.copy('provisions/prod.provisionprofile', 'Release/app/${lime.app.file}.app/Contents/embedded.provisionprofile');
-      }
+      }*/
       
       if ( FileSystem.exists('provisions/store.provisionprofile') )
       {
         File.copy('provisions/store.provisionprofile', 'Release/store/${lime.app.file}.app/Contents/embedded.provisionprofile');
       }
       
-      // Sign
-      //call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "Release/mac.plist"');
+      // OKAY! Seems like I can upload build to itune with game-center, however it's crashes on the machine, but testing other open-source examples
+      // they all seems to crash, others on forum seems to mention it... Hopefully it will go live on the app store!
+      // Also, seems like when we distribute outside, we don't want any provisionprofile (why is there an option on the website?) and no entitlements...
       
-      for ( file in FileSystem.readDirectory('Release/app/${lime.app.file}.app/Contents/MacOS') )
+      // Sign
+      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep"');
+      
+      /*for ( file in FileSystem.readDirectory('Release/app/${lime.app.file}.app/Contents/MacOS') )
       {
         trace('Signing: ${file}');
         call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/Contents/MacOS/${file}" --entitlements "${getPath()}/utils/child.plist"');
       }
       
-      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --entitlements "Release/mac.plist"');
+      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --entitlements "Release/mac.plist"');*/
       
       // Only add game-center for store? Not part of the provisioning profile despite saying otherwise on dev center...
       if ( project.json.gamecenter )
