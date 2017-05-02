@@ -2123,10 +2123,10 @@ class Main
       File.saveContent('Release/mac.plist', entitlements);
       
       // Add provisionProfile
-      /*if ( FileSystem.exists('provisions/prod.provisionprofile') )
+      if ( FileSystem.exists('provisions/prod.provisionprofile') )
       {
         File.copy('provisions/prod.provisionprofile', 'Release/app/${lime.app.file}.app/Contents/embedded.provisionprofile');
-      }*/
+      }
       
       if ( FileSystem.exists('provisions/store.provisionprofile') )
       {
@@ -2138,17 +2138,19 @@ class Main
       // Also, seems like when we distribute outside, we don't want any provisionprofile (why is there an option on the website?) and no entitlements...
       
       // Sign
-      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep');
+      //call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep');
       
-      /*for ( file in FileSystem.readDirectory('Release/app/${lime.app.file}.app/Contents/MacOS') )
+      // Might as well use entitlements and sandbox the app (no harm done here, right? RIGHT!?)
+      for ( file in FileSystem.readDirectory('Release/app/${lime.app.file}.app/Contents/MacOS') )
       {
         trace('Signing: ${file}');
         call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/Contents/MacOS/${file}" --entitlements "${getPath()}/utils/child.plist"');
       }
       
-      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --entitlements "Release/mac.plist"');*/
+      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --entitlements "Release/mac.plist"');
       
       // Only add game-center for store? Not part of the provisioning profile despite saying otherwise on dev center...
+      // Actually, deep into the documentation, it is stated that Game Center do not work outside of the Mac App Store...
       if ( project.json.gamecenter )
       {
         entitlements = entitlements.replace('</dict>', '<key>com.apple.developer.game-center</key><true/></dict>');
