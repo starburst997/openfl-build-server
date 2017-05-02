@@ -2159,8 +2159,11 @@ class Main
       call('codesign -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" "Release/${lime.app.file}-${git}.dmg"');
       
       // Send server
-      sendServer('${lime.app.file}', 'mac-setup', 'Release/${lime.app.file}-${git}.pkg', lime.meta.version);
-      sendServer('${lime.app.file}', 'mac-store', 'Release/osx/${lime.app.file}-store-${git}.pkg', lime.meta.version);
+      if ( test == 0 )
+      {
+        sendServer('${lime.app.file}', 'mac-setup', 'Release/${lime.app.file}-${git}.pkg', lime.meta.version);
+        sendServer('${lime.app.file}', 'mac-store', 'Release/osx/${lime.app.file}-store-${git}.pkg', lime.meta.version);
+      }
     }
   }
   
