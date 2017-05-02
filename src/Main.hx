@@ -2102,6 +2102,17 @@ class Main
       }
       File.saveContent('Release/mac.plist', entitlements);
       
+      // Add provisionProfile
+      if ( FileSystem.exists('provisions/prod.provisionprofile') )
+      {
+        File.copy('provisions/prod.provisionprofile', 'Release/app/${lime.app.file}.app/Contents/embedded.provisionprofile');
+      }
+      
+      if ( FileSystem.exists('provisions/store.provisionprofile') )
+      {
+        File.copy('provisions/store.provisionprofile', 'Release/store/${lime.app.file}.app/Contents/embedded.provisionprofile');
+      }
+      
       // Sign
       call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "Release/mac.plist"');
       call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "Release/mac.plist"');
