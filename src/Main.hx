@@ -86,6 +86,9 @@ typedef ProjectJSON =
   // If this is a legacy OpenFL project
   @optional var legacy:Bool;
   
+  // If this is a legacy OpenFL project
+  @optional var gamecenter:Bool;
+  
   // Specify if this is in landscape
   @optional var landscape:Bool;
 }
@@ -2085,14 +2088,23 @@ class Main
       call('sudo rm Release/store/${lime.app.file}.app/Contents/Info.plist');
       
       plist = plist.replace('1.0.0', '${lime.meta.version}');
+      plist = plist.replace('</dict>', '<key>ITSAppUsesNonExemptEncryption</key><false/></dict>');
       File.saveContent('Release/app/${lime.app.file}.app/Contents/Info.plist', plist);
       File.saveContent('Release/store/${lime.app.file}.app/Contents/Info.plist', plist);
       
       FileSystem.createDirectory('Release/osx');
       
+      // Mac.plist
+      var entitlements = File.getContent('${getPath()}/utils/mac.plist');
+      if ( project.json.gamecenter )
+      {
+        entitlements = entitlements.replace('</dict>', '<key>com.apple.developer.game-center</key><true/></dict>');
+      }
+      File.saveContent('Release/mac.plist', entitlements);
+      
       // Sign
-      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "${getPath()}/utils/mac.plist"');
-      call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "${getPath()}/utils/mac.plist"');
+      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "Release/mac.plist"');
+      call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "Release/mac.plist"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "Developer ID Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
