@@ -2098,7 +2098,7 @@ class Main
       var entitlements = File.getContent('${getPath()}/utils/mac.plist');
       if ( project.json.gamecenter )
       {
-        entitlements = entitlements.replace('</dict>', '<key>com.apple.developer.game-center</key><true/></dict>');
+        //entitlements = entitlements.replace('</dict>', '<key>com.apple.developer.game-center</key><true/></dict>');
       }
       File.saveContent('Release/mac.plist', entitlements);
       
