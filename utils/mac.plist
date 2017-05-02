@@ -5,5 +5,7 @@
     <true/>
     <key>com.apple.security.network.client</key>
     <true/>
+    <key>com.apple.security.application-groups</key>
+    <string>::TEAM_ID::.::PKG::</string>
   </dict>
 </plist>

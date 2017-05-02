@@ -215,6 +215,10 @@ class Main
         action = 'build';
         rel = './projects';
         if ( (args.length > 1) && (Std.parseInt(args[1]) > 0) ) test = Std.parseInt(args[1]);
+        if ( (args.length > 2) && (args[2] == '.') ) 
+        {
+          rel = '.';
+        }
       }
     }
     
@@ -2096,10 +2100,14 @@ class Main
       
       // Mac.plist
       var entitlements = File.getContent('${getPath()}/utils/mac.plist');
-      if ( project.json.gamecenter )
+      /*if ( project.json.gamecenter )
       {
         entitlements = entitlements.replace('</dict>', '<key>com.apple.developer.game-center</key><true/></dict>');
-      }
+      }*/
+      
+      entitlements = entitlements.replace('::TEAM_ID::', '${lime.certificate.teamID}');
+      entitlements = entitlements.replace('::PKG::', '${lime.meta.pkg}');
+      
       File.saveContent('Release/mac.plist', entitlements);
       
       // Add provisionProfile
@@ -2114,8 +2122,31 @@ class Main
       }
       
       // Sign
-      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "Release/mac.plist"');
-      call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "Release/mac.plist"');
+      //call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --deep --entitlements "Release/mac.plist"');
+      
+      for ( file in FileSystem.readDirectory('Release/app/${lime.app.file}.app/Contents/MacOS') )
+      {
+        trace('Signing: ${file}');
+        call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/Contents/MacOS/${file}" --entitlements "${getPath()}/utils/child.plist"');
+      }
+      
+      call('sudo codesign -f -s "Developer ID Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/" --entitlements "Release/mac.plist"');
+      
+      // Only add game-center for store? Not part of the provisioning profile despite saying otherwise on dev center...
+      if ( project.json.gamecenter )
+      {
+        entitlements = entitlements.replace('</dict>', '<key>com.apple.developer.game-center</key><true/></dict>');
+      }
+      File.saveContent('Release/mac_store.plist', entitlements);
+      
+      for ( file in FileSystem.readDirectory('Release/store/${lime.app.file}.app/Contents/MacOS') )
+      {
+        trace('Signing: ${file}');
+        call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/app/${lime.app.file}.app/Contents/MacOS/${file}" --entitlements "${getPath()}/utils/child.plist"');
+      }
+      
+      //call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --deep --entitlements "Release/mac_store.plist"');
+      call('sudo codesign -f -s "3rd Party Mac Developer Application: ${config.publisher} (${lime.certificate.teamID})" -v "Release/store/${lime.app.file}.app/" --entitlements "Release/mac_store.plist"');
       
       // Create PKG
       call('productbuild --component "Release/app/${lime.app.file}.app/" /Applications --sign "Developer ID Installer: ${config.publisher} (${lime.certificate.teamID})" --product "Release/app/${lime.app.file}.app/Contents/Info.plist" "Release/${lime.app.file}-${git}.pkg"');
