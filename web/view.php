@@ -164,6 +164,7 @@
 
     $flash = getFile("builds/$id/$git/flash");
     $android = getFile("builds/$id/$git/android");
+    $amazon = getFile("builds/$id/$git/amazon");
     $chrome = getFile("builds/$id/$git/chrome");
     $chromeCrx = getFile("builds/$id/$git/chrome-crx");
     $html5 = getFile("builds/$id/$git/html5");
@@ -477,6 +478,9 @@
 						<?php if ( $android ): ?>
             <a class="btn btn-lg btn-primary" href="<?php echo $android; ?>" role="button" title="">APK (<?php echo showFilesize($android); ?>B)</a>
 					  <?php endif; ?>
+            <?php if ( $amazon ): ?>
+            <a class="btn btn-lg btn-primary" href="<?php echo $amazon; ?>" role="button" title="">Amazon (<?php echo showFilesize($amazon); ?>B)</a>
+            <?php endif; ?>
            </div>
 				 </div>
          <?php endif; ?>
