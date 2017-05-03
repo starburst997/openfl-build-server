@@ -2035,6 +2035,12 @@ class Main
       // Weird missing folder      
       removeDir('Export/android/bin');
       
+      createDir('Export/android/bin/deps/google-play-services-base/src');
+      createDir('Export/android/bin/deps/google-play-services-games/src');
+      createDir('Export/android/bin/deps/google-play-services-drive/src');
+      createDir('Export/android/bin/deps/google-play-services-plus/src');
+      createDir('Export/android/bin/deps/google-play-services-basement/src');
+      
       log = call('haxelib run openfl build project.amazon.xml android -verbose -Damazon -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy -Drelease > Release/amazon.log');
     }
     else
