@@ -86,8 +86,11 @@ typedef ProjectJSON =
   // If this is a legacy OpenFL project
   @optional var legacy:Bool;
   
-  // If this is a legacy OpenFL project
+  // If we use the gamecenter API
   @optional var gamecenter:Bool;
+  
+  // Include special amazon APK with define "-Damazon"
+  @optional var amazon:Bool;
   
   // Specify if this is in landscape
   @optional var landscape:Bool;
@@ -984,7 +987,11 @@ class Main
               compileLinux( project, p, limeProject );
               //compileLinux32( project, p, limeProject ); // Seems broken
               compileAndroid( project, p, limeProject );
-              compileAmazon( project, p, limeProject );
+              
+              if ( project.json.amazon )
+              {
+                compileAmazon( project, p, limeProject );
+              }
               
               // Finally deploy
               if ( deploy )
