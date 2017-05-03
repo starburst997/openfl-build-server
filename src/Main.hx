@@ -984,6 +984,7 @@ class Main
               compileLinux( project, p, limeProject );
               //compileLinux32( project, p, limeProject ); // Seems broken
               compileAndroid( project, p, limeProject );
+              compileAmazon( project, p, limeProject );
               
               // Finally deploy
               if ( deploy )
@@ -1979,6 +1980,128 @@ class Main
     else
     {
       sendError('${lime.app.file}', 'android', 'Fatal Error: Not even a log output!', lime.meta.version);
+    }
+  }
+  
+  // Compile Amazon
+  static function compileAmazon( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    trace("- AMAZON -");
+    
+    // Create XML project file
+    if ( FileSystem.exists('project.amazon.xml') )
+    {
+      FileSystem.deleteFile('project.amazon.xml');
+    }
+    
+    var pkg = lime.meta.pkg;
+    
+    var key = readKey();
+    if ( key != null )
+    {
+      var xml:String = File.getContent('project.xml');
+      xml = xml.replace('</project>', '<certificate path="certificates/key.keystore" password="${key.password}" alias="${key.alias}" alias-password="${key.aliasPassword}" /></project>');
+      
+      var fast = new Fast( Xml.parse(xml).firstElement() );
+      for ( node in fast.nodes.meta )
+      {
+        if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'android') )
+        {
+          xml = xml.replace('${lime.meta.pkg}', node.att.resolve('package'));
+          pkg = node.att.resolve('package');
+        }
+      }
+      
+      File.saveContent('project.amazon.xml', xml);
+    }
+    else
+    {
+      trace('!!! ERROR: MISSING KEY FOR AMAZON');
+      return;
+    }
+    
+    // Compile
+    var log:String = '';
+    
+    if ( project.json.legacy )
+    {
+      // Weird missing folder      
+      removeDir('Export/android/bin');
+      
+      log = call('haxelib run openfl build project.amazon.xml android -verbose -Damazon -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy -Drelease > Release/amazon.log');
+    }
+    else
+    {
+      // Weird bug?
+      removeDir('Export/android');
+      createDir('Export/android/final/haxe/_generated');
+      
+      log = call('haxelib run openfl build project.amazon.xml android -verbose -Damazon -Dgit=${git} -Dversion=${lime.meta.version} -final > Release/amazon.log');
+    }
+    
+    // Cleanup
+    //FileSystem.deleteFile('project.android.xml');
+    
+    // Get log
+    log = getLog('Release/amazon.log');
+    
+    trace('');
+    Sys.print(log);
+    trace('');
+    
+    // Copy package
+    var bytes:Bytes = null;
+    
+    if ( project.json.legacy )
+    {
+      if ( FileSystem.exists('Export/android/bin/bin/${lime.app.file}-release.apk') ) bytes = File.getBytes('Export/android/bin/bin/${lime.app.file}-release.apk');
+    }
+    else
+    {
+      if ( FileSystem.exists('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk') ) bytes = File.getBytes('Export/android/final/bin/app/build/outputs/apk/${lime.app.file}-release.apk');
+    }
+    
+    addRelease( bytes, '${lime.app.file}-amazon-${git}.apk' );
+    
+    // Test script
+    var script = File.getContent('${getPath()}/utils/android.sh');
+    script = script.replace('::APK::', '${lime.app.file}-amazon-${git}.apk');
+    script = script.replace('::PKG::', '${pkg}');
+    File.saveContent('Release/amazon.sh', script);
+    call('chmod +x Release/amazon.sh');
+    
+    // Quick build for testing
+    var quick = '';
+    if ( project.json.legacy )
+    {
+      quick = File.getContent('${getPath()}/utils/quick_android_legacy.sh');
+    }
+    else
+    {
+      quick = File.getContent('${getPath()}/utils/quick_android.sh');
+    }
+    
+    quick = quick.replace('::APK::', '${lime.app.file}-amazon-${git}.apk');
+    quick = quick.replace('::PKG::', '${pkg}');
+    quick = quick.replace('::GIT::', '${git}');
+    quick = quick.replace('::VERSION::', '${lime.meta.version}');
+    File.saveContent('Release/quick_amazon.sh', quick);
+    call('chmod +x Release/quick_amazon.sh');
+    
+    // Send to server
+    if ( FileSystem.exists('Release/${lime.app.file}-amazon-${git}.apk') )
+    {
+      sendServer('${lime.app.file}', 'amazon', 'Release/${lime.app.file}-amazon-${git}.apk', lime.meta.version);
+      sendLogServer('${lime.app.file}', 'amazon', 'Release/amazon.log', lime.meta.version);
+    }
+    else if ( FileSystem.exists('Release/amazon.log') )
+    {
+      var log = File.getContent('Release/amazon.log');
+      sendError('${lime.app.file}', 'amazon', 'Compile error:\n\n${log}', lime.meta.version);
+    }
+    else
+    {
+      sendError('${lime.app.file}', 'amazon', 'Fatal Error: Not even a log output!', lime.meta.version);
     }
   }
   
