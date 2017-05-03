@@ -1,0 +1,15 @@
+name: ::SNAP::
+version: "::VERSION::"
+summary: ::SUMMARY::
+description: ::DESCRIPTION::
+confinement: strict
+grade: stable
+
+apps:
+  ::FILE:::
+    command: ::FILE::
+
+parts:
+  pintown:
+    plugin: dump
+    source: ../bin
