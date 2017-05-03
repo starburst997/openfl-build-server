@@ -7,7 +7,8 @@ grade: stable
 
 apps:
   ::FILE:::
-    command: ::FILE::
+    command: ::FILE::.sh
+    plugs: [unity7, opengl, x11, network, home]
 
 parts:
   pintown:
