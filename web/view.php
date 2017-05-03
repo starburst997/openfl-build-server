@@ -476,7 +476,7 @@
 					 </div>
 					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
 						<?php if ( $android ): ?>
-            <a class="btn btn-lg btn-primary" href="<?php echo $android; ?>" role="button" title="">APK (<?php echo showFilesize($android); ?>B)</a>
+            <a class="btn btn-lg btn-primary" href="<?php echo $android; ?>" role="button" title="">APK (<?php echo showFilesize($android); ?>B)</a><br/>
 					  <?php endif; ?>
             <?php if ( $amazon ): ?>
             <a class="btn btn-lg btn-primary" href="<?php echo $amazon; ?>" role="button" title="">Amazon (<?php echo showFilesize($amazon); ?>B)</a>
