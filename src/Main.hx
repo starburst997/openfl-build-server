@@ -796,10 +796,10 @@ class Main
       }
     }
     
-    trace('');
+    /*trace('');
     trace('Verifying haxelib...');
     trace('');
-    call('haxelib', ['list']);
+    call('haxelib', ['list']);*/
     
     separ();
   }
@@ -1904,6 +1904,7 @@ class Main
       createDir('Export/android/bin/deps/google-play-services-drive/src');
       createDir('Export/android/bin/deps/google-play-services-plus/src');
       createDir('Export/android/bin/deps/google-play-services-basement/src');
+      createDir('Export/android/bin/deps/google-play-services-analytics-impl/src');
       
       log = call('haxelib run openfl build project.android.xml android -verbose -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy -Drelease > Release/android.log');
     }
@@ -2040,6 +2041,7 @@ class Main
       createDir('Export/android/bin/deps/google-play-services-drive/src');
       createDir('Export/android/bin/deps/google-play-services-plus/src');
       createDir('Export/android/bin/deps/google-play-services-basement/src');
+      createDir('Export/android/bin/deps/google-play-services-analytics-impl/src');
       
       log = call('haxelib run openfl build project.amazon.xml android -verbose -Damazon -Dgit=${git} -Dversion=${lime.meta.version} -Dlegacy -Drelease > Release/amazon.log');
     }
