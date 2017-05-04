@@ -89,6 +89,9 @@ typedef ProjectJSON =
   // If we use the gamecenter API
   @optional var gamecenter:Bool;
   
+  // Use ads
+  @optional var ads:Bool;
+  
   // Include special amazon APK with define "-Damazon"
   @optional var amazon:Bool;
   
@@ -2360,6 +2363,12 @@ class Main
       
       // Require Fullscreen
       var infoPlist = File.getContent('${getPath()}/utils/info.plist');
+      
+      if ( project.json.ads )
+      {
+        infoPlist = infoPlist.replace('<!-- REPLACE_ME -->', '<key>NSCalendarsUsageDescription</key><string>Adding events</string><key>NSPhotoLibraryUsageDescription</key><string>Taking selfies</string><key>NSCameraUsageDescription</key><string>Taking selfies</string><key>NSMotionUsageDescription</key><string>Interactive ad controls</string>');
+      }
+      
       FileSystem.createDirectory('templates_ignore/iphone/PROJ');
       File.saveContent('templates_ignore/iphone/PROJ/PROJ-Info.plist', infoPlist);
       
@@ -2385,6 +2394,12 @@ class Main
       
       // Remove NSAllowArbritaryLoad
       var infoPlist = File.getContent('${getPath()}/utils/info.plist');
+      
+      if ( project.json.ads )
+      {
+        infoPlist = infoPlist.replace('<!-- REPLACE_ME -->', '<key>NSCalendarsUsageDescription</key><string>Adding events</string><key>NSPhotoLibraryUsageDescription</key><string>Taking selfies</string><key>NSCameraUsageDescription</key><string>Taking selfies</string><key>NSMotionUsageDescription</key><string>Interactive ad controls</string>');
+      }
+      
       FileSystem.createDirectory('templates_ignore/iphone/PROJ');
       File.saveContent('templates_ignore/iphone/PROJ/PROJ-Info.plist', infoPlist);
       
