@@ -154,6 +154,8 @@ class Main
   static var fix = false; // Hack
   static var test = 0; // Run tests for debugging
   
+  static var noLinux = false;
+  
   static var deploy = false;
   
 	// Starting point
@@ -233,6 +235,11 @@ class Main
       if ( arg == "deploy" )
       {
         deploy = true;
+      }
+      
+      if ( arg == "noLinux" )
+      {
+        noLinux = true;
       }
     }
     
@@ -978,6 +985,7 @@ class Main
           if ( test != 0 )
           {
             if ( test == 1 ) installerLinux( project, p, limeProject );
+            if ( test == 2 ) snapLinux( project, p, limeProject );
           }
           else
           {
@@ -987,7 +995,7 @@ class Main
             }
             else
             {
-              compileLinux( project, p, limeProject );
+              if ( !noLinux ) compileLinux( project, p, limeProject );
               //compileLinux32( project, p, limeProject ); // Seems broken
               compileAndroid( project, p, limeProject );
               
@@ -2016,7 +2024,7 @@ class Main
       var fast = new Fast( Xml.parse(xml).firstElement() );
       for ( node in fast.nodes.meta )
       {
-        if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'android') )
+        if ( node.has.resolve('package') && node.has.resolve('if') && (node.att.resolve('if') == 'amazon') )
         {
           xml = xml.replace('${lime.meta.pkg}', node.att.resolve('package'));
           pkg = node.att.resolve('package');
@@ -2696,6 +2704,71 @@ class Main
     
     // Create .deb package for linux
     installerLinux( project, info, lime );
+    snapLinux( project, info, lime );
+  }
+  static function snapLinux( project:Project, info:ProjectInfo, lime:HXProject )
+  {
+    createDir('Release/snap');
+    
+    var snapID = lime.app.file.toLowerCase();
+    var summary = '${lime.meta.title}';
+    var description = '${lime.meta.title}';
+    
+    // Get summary / description
+    var xml:String = File.getContent('project.xml');
+    var fast = new Fast( Xml.parse(xml).firstElement() );
+    for ( node in fast.nodes.snap )
+    {
+      if ( node.has.resolve('summary') )
+      {
+        summary = node.att.resolve('summary');
+      }
+      
+      if ( node.has.resolve('description') )
+      {
+        description = node.att.resolve('description');
+        description = description.replace('\n', '  \n');
+      }
+      
+      if ( node.has.resolve('name') )
+      {
+        snapID = node.att.resolve('name');
+      }
+    }
+    
+    // Yaml
+    var snap = File.getContent('${getPath()}/utils/snapcraft.yaml');
+    
+    snap = snap.replace('::VERSION::', '${lime.meta.version}');
+    snap = snap.replace('::SNAP::', '${snapID}');
+    snap = snap.replace('::FILE::', '${lime.app.file}');
+    snap = snap.replace('::SUMMARY::', '${summary}');
+    snap = snap.replace('::DESCRIPTION::', '${description}');
+    
+    File.saveContent('Release/snap/snapcraft.yaml', snap);
+    
+    // Desktop
+    var desktop = File.getContent('${getPath()}/utils/snapcraft.desktop');
+    
+    desktop = desktop.replace('::VERSION::', '${lime.meta.version}');
+    desktop = desktop.replace('::SNAP::', '${snapID}');
+    desktop = desktop.replace('::NAME::', '${lime.meta.title}');
+    desktop = desktop.replace('::FILE::', '${lime.app.file}');
+    
+    File.saveContent('Release/deb/opt/${lime.app.file}/${snapID}.desktop', desktop);
+    FileSystem.deleteFile('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop');
+    
+    // Snapcraft
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/snap');
+    call('snapcraft');
+    Sys.setCwd('${cwd}/${project.path}/${info.folder}');
+    
+    // Verify the file exists
+    if ( FileSystem.exists('Release/snap/${snapID}_${lime.meta.version}_amd64.snap') )
+    {
+      FileSystem.rename('Release/snap/${snapID}_${lime.meta.version}_amd64.snap', 'Release/snap/${lime.app.file}_${git}_amd64.snap');
+      sendServer('${lime.app.file}', 'snap', 'Release/snap/${lime.app.file}_${git}_amd64.snap', lime.meta.version);
+    }
   }
   static function installerLinux( project:Project, info:ProjectInfo, lime:HXProject )
   {
