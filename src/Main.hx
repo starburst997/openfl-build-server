@@ -261,6 +261,11 @@ class Main
     cwd = Sys.getCwd();
     trace('CWD: ${cwd}');
     
+    if ( test > 0 )
+    {
+      trace('TEST MODE: ${test}, ${rel}');
+    }
+    
     separ();
     
     if ( config == null )
@@ -2712,7 +2717,7 @@ class Main
     
     var snapID = lime.app.file.toLowerCase();
     var summary = '${lime.meta.title}';
-    var description = '${lime.meta.title}';
+    var description = '  ${lime.meta.title}';
     
     // Get summary / description
     var xml:String = File.getContent('project.xml');
