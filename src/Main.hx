@@ -2761,7 +2761,11 @@ class Main
     desktop = desktop.replace('::FILE::', '${lime.app.file}');
     
     File.saveContent('Release/deb/opt/${lime.app.file}/${snapID}.desktop', desktop);
-    FileSystem.deleteFile('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop');
+    
+    if ( FileSystem.exists('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop') )
+    {
+      FileSystem.deleteFile('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop');
+    }
     
     // Snapcraft
     Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/snap');
