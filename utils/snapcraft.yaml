@@ -1,16 +1,22 @@
 name: ::SNAP::
 version: "::VERSION::"
 summary: ::SUMMARY::
-description: ::DESCRIPTION::
+description: |
+::DESCRIPTION::
 confinement: strict
 grade: stable
+icon: ../deb/opt/::FILE::/Icon/256x256/::FILE::.png
 
 apps:
-  ::FILE:::
+  ::SNAP:::
     command: ::FILE::.sh
-    plugs: [unity7, opengl, x11, network, home]
+    desktop: ::SNAP::.desktop
+    plugs: [opengl, x11, network, home, pulseaudio]
 
 parts:
   pintown:
     plugin: dump
-    source: ../bin
+    source: ../deb/opt/::FILE::
+    stage-packages:
+      - libsdl2-2.0-0
+      - libsdl2-mixer-2.0-0

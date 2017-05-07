@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=::VERSION::
+Type=Application
+Terminal=false
+Exec=::SNAP:: %F
+Name=::NAME::
+GenericName=::NAME::
+Categories=Game;
+Icon=${SNAP}/Icon/256x256/::FILE::.png
