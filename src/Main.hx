@@ -927,7 +927,11 @@ class Main
         //createDir('Release');
         createDir('Export');
         trace('Create Export');
-        emptyDir('Release'); // Better since we can keep it open in OS
+        //emptyDir('Release'); // Better since we can keep it open in OS
+        if ( FileSystem.exists('Release') )
+        {
+          call('rm -Rf Release/*');
+        }
         trace('Empty Release');
       }
       
