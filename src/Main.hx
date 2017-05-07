@@ -923,11 +923,12 @@ class Main
         trace('Removing Release / Export directory...');
         //removeDir('Release');
         removeDir('Export'); // Necessary???
-        
+        trace('Export removed');
         //createDir('Release');
         createDir('Export');
-        
+        trace('Create Export');
         emptyDir('Release'); // Better since we can keep it open in OS
+        trace('Empty Release');
       }
       
       trace('');
