@@ -2732,7 +2732,7 @@ class Main
       if ( node.has.resolve('description') )
       {
         description = node.att.resolve('description');
-        description = description.replace('\n', '  \n');
+        description = '  ' + description.replace('\\n', '  \n');
       }
       
       if ( node.has.resolve('name') )
