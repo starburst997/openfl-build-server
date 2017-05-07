@@ -174,6 +174,7 @@
     $macSetup = getFile("builds/$id/$git/mac-setup");
     $macStore = getFile("builds/$id/$git/mac-store");
     $ubuntu = getFile("builds/$id/$git/ubuntu");
+    $snap = getFile("builds/$id/$git/snap");
     $windows = getFile("builds/$id/$git/windows");
     $windowsAppx = getFile("builds/$id/$git/windows-appx");
     $windowsHtml5Appx = getFile("builds/$id/$git/windows-html5-appx");
@@ -565,8 +566,11 @@
 						<p class="versionTitle"><img src="images/platform_linux.jpg" height="60"> Linux <span class="versionSubtitle"><br/><i><a href="<?php echo "./log.php?id=$id&git=$git&platform=linux&password=$password"; ?>" target="_blank">View log</a></i></span></p>
 					 </div>
 					 <div class="col-md-6 col-sm-6 noPadMar versionBtns">
-						<?php if ( $ubuntu ): ?>
-            <a class="btn btn-lg btn-primary" href="<?php echo $ubuntu; ?>" role="button" title="">Ubuntu - 64bit (<?php echo showFilesize($ubuntu); ?>B)</a><br/>
+						<?php if ( $snap ): ?>
+            <a class="btn btn-lg btn-primary" href="<?php echo $snap; ?>" role="button" title="">Snap - 64bit (<?php echo showFilesize($snap); ?>B)</a><br/>
+            <?php endif; ?>
+            <?php if ( $ubuntu ): ?>
+            <a class="btn btn-lg btn-primary" href="<?php echo $ubuntu; ?>" role="button" title="">Debian - 64bit (<?php echo showFilesize($ubuntu); ?>B)</a><br/>
             <?php endif; ?>
             <?php if ( $linux ): ?>
             <a class="btn btn-lg btn-primary" href="<?php echo $linux; ?>" role="button" title="">Portable - 64bit (<?php echo showFilesize($linux); ?>B)</a>
