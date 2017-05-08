@@ -2271,6 +2271,12 @@ class Main
       
       plist = plist.replace('1.0.0', '${lime.meta.version}');
       plist = plist.replace('</dict>', '<key>ITSAppUsesNonExemptEncryption</key><false/></dict>');
+      
+      // Fix version
+      var v = lime.meta.version.replace('.', '');
+      plist = plist.replace('<key>CFBundleVersion</key>\n <string>1</string>', '<key>CFBundleVersion</key>\n <string>${v}</string>');
+      plist = plist.replace('<key>CFBundleVersion</key>\n <string>2</string>', '<key>CFBundleVersion</key>\n <string>${v}</string>');
+      
       File.saveContent('Release/app/${lime.app.file}.app/Contents/Info.plist', plist);
       File.saveContent('Release/store/${lime.app.file}.app/Contents/Info.plist', plist);
       
@@ -2382,6 +2388,11 @@ class Main
       // Require Fullscreen
       var infoPlist = File.getContent('${getPath()}/utils/info.plist');
       
+      // Fix version
+      var v = lime.meta.version.replace('.', '');
+      infoPlist = infoPlist.replace('<key>CFBundleVersion</key>\n <string>1</string>', '<key>CFBundleVersion</key>\n <string>${v}</string>');
+      infoPlist = infoPlist.replace('<key>CFBundleVersion</key>\n <string>2</string>', '<key>CFBundleVersion</key>\n <string>${v}</string>');
+      
       if ( project.json.ads )
       {
         infoPlist = infoPlist.replace('<!-- REPLACE_ME -->', '<key>NSCalendarsUsageDescription</key><string>Adding events</string><key>NSPhotoLibraryUsageDescription</key><string>Taking selfies</string><key>NSCameraUsageDescription</key><string>Taking selfies</string><key>NSMotionUsageDescription</key><string>Interactive ad controls</string>');
@@ -2412,6 +2423,11 @@ class Main
       
       // Remove NSAllowArbritaryLoad
       var infoPlist = File.getContent('${getPath()}/utils/info.plist');
+      
+      // Fix version
+      var v = lime.meta.version.replace('.', '');
+      infoPlist = infoPlist.replace('<key>CFBundleVersion</key>\n <string>1</string>', '<key>CFBundleVersion</key>\n <string>${v}</string>');
+      infoPlist = infoPlist.replace('<key>CFBundleVersion</key>\n <string>2</string>', '<key>CFBundleVersion</key>\n <string>${v}</string>');
       
       if ( project.json.ads )
       {
