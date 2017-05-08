@@ -14,7 +14,7 @@ apps:
     plugs: [opengl, x11, network, home, pulseaudio]
 
 parts:
-  pintown:
+  ::SNAP:::
     plugin: dump
     source: ../deb/opt/::FILE::
     stage-packages:
