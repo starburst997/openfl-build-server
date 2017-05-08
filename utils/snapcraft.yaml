@@ -19,6 +19,8 @@ parts:
     source: ../deb/opt/::FILE::
     stage-packages:
       - libsdl2-2.0-0
+      - libsdl2-gfx-1.0-0
       - libsdl2-mixer-2.0-0
       - libgl1-mesa-glx
       - libgl1-mesa-dri
+      - libgles2-mesa

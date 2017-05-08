@@ -2788,6 +2788,18 @@ class Main
       FileSystem.deleteFile('Release/deb/opt/${lime.app.file}/${lime.app.file}.desktop');
     }
     
+    // Wrapper
+    if ( FileSystem.exists('Release/deb/opt/${lime.app.file}/${lime.app.file}.sh') )
+    {
+      FileSystem.deleteFile('Release/deb/opt/${lime.app.file}/${lime.app.file}.sh');
+    }
+    
+    var wrapper = File.getContent('${getPath()}/utils/snapcraft.sh');
+    
+    wrapper = wrapper.replace('::FILE::', '${lime.app.file}');
+    
+    File.saveContent('Release/deb/opt/${lime.app.file}/${lime.app.file}.sh', wrapper);
+    
     // Snapcraft
     Sys.setCwd('${cwd}/${project.path}/${info.folder}/Release/snap');
     call('snapcraft');

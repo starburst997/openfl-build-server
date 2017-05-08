@@ -191,8 +191,6 @@ if [ -d "$SNAP/testability/$ARCH" ]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SNAP/testability:$SNAP/testability/$ARCH:$SNAP/testability/$ARCH/mesa
 fi
 
-echo Starting ::FILE:: $ARCH $SNAP
-echo $LD_LIBRARY_PATH
-echo ...
+echo Starting ::FILE::, $ARCH, $SNAP
 
 exec ./::FILE:: "$@"
