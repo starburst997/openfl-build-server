@@ -9,7 +9,7 @@ icon: ../deb/opt/::FILE::/Icon/256x256/::FILE::.png
 
 apps:
   ::SNAP:::
-    command: ::FILE::.sh
+    command: bash $SNAP/::FILE::.sh
     desktop: ::SNAP::.desktop
     plugs: [opengl, x11, network, home, pulseaudio]
 
@@ -20,3 +20,5 @@ parts:
     stage-packages:
       - libsdl2-2.0-0
       - libsdl2-mixer-2.0-0
+      - libgl1-mesa-glx
+      - libgl1-mesa-dri
