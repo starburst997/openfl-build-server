@@ -2275,7 +2275,7 @@ class Main
       // Fix version
       var v = lime.meta.version.replace('.', '');
       var r = ~/<key>CFBundleVersion<\/key>[^<]*<string>([^<]+)<\/string>/g;
-      plist = r.replace(plist,v);
+      plist = r.replace(plist,'<key>CFBundleVersion</key><string>${v}</string>');
       
       File.saveContent('Release/app/${lime.app.file}.app/Contents/Info.plist', plist);
       File.saveContent('Release/store/${lime.app.file}.app/Contents/Info.plist', plist);
@@ -2391,7 +2391,7 @@ class Main
       // Fix version
       var v = lime.meta.version.replace('.', '');
       var r = ~/<key>CFBundleVersion<\/key>[^<]*<string>([^<]+)<\/string>/g;
-      infoPlist = r.replace(infoPlist,v);
+      infoPlist = r.replace(infoPlist,'<key>CFBundleVersion</key><string>${v}</string>');
       
       if ( project.json.ads )
       {
@@ -2427,7 +2427,7 @@ class Main
       // Fix version
       var v = lime.meta.version.replace('.', '');
       var r = ~/<key>CFBundleVersion<\/key>[^<]*<string>([^<]+)<\/string>/g;
-      infoPlist = r.replace(infoPlist,v);
+      infoPlist = r.replace(infoPlist,'<key>CFBundleVersion</key><string>${v}</string>');
       
       if ( project.json.ads )
       {
