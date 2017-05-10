@@ -8,7 +8,7 @@
 
   use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 
-  $N = 10;
+  $N = 5; // Saving space
 
   $adminPassword = $password;
 

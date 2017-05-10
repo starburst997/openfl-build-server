@@ -3,6 +3,8 @@
   include("config.php");
   include("utils.php");
 
+  $N = 5; // Saving space
+
   $adminPassword = $password;
 
   // Simple password check, really dummy...
@@ -101,7 +103,18 @@
           $builds = loadGit("$id/release");
           $builds[] = $beta;
 
-          usort($r, 'sortCustom');
+          usort($builds, 'sortCustom');
+
+          // If we are over N delete oldest
+          if ( count($builds) > $N )
+          {
+            while ( count($builds) > $N )
+            {
+              $build = array_pop($builds);
+
+              deleteDir("./builds/$id/release/".$build['version']);
+            }
+          }
 
           // Rewrite text file
           $first = true;
